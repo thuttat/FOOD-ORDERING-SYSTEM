@@ -10,7 +10,7 @@
 ## 1. Công việc đã hoàn thành
 | Thành viên | MSSV | Công việc | Link Commit/PR |
 |------------|------|-----------|----------------|
-| Trịnh Thị Anh Thư | 2351010205 | Khởi tạo repository trên GitHub, thiết lập cấu trúc thư mục dự án, và dựng khung cơ bản cho backend bằng Spring Boot | [1fd0a6b] (https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/1fd0a6b) |
+| Trịnh Thị Anh Thư | 2351010205 | Khởi tạo repository trên GitHub, thiết lập cấu trúc thư mục dự án, và dựng khung cơ bản cho backend bằng Spring Boot | [1fd0a6b](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/1fd0a6b) |
 | Lê Hoàng Bảo Trân | 2351010214 | Tạo file README.md (thông tin nhóm, tech stack) | [01aa76a ](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/01aa76a) |
 | Nguyễn Triệu Duy | 2351010036 | Khởi tạo template báo cáo Tuần 1 | [ 6dd5959 ](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/6dd5959) | 
 
