@@ -19,7 +19,7 @@
 ## 2. Tiến độ tổng thể
 | Hạng mục | Trạng thái | % |
 |----------|------------|---|
-| Phân tích yêu cầu | Đã hoàn thành | 10% |
+| Phân tích yêu cầu | Đã hoàn thành | 100% |
 | Thiết kế kiến trúc | Đang làm | 10% |
 | Backend API | Chưa bắt đầu | 0% |
 | Frontend UI | Chưa bắt đầu | 0% |
