@@ -22,9 +22,18 @@ Hệ thống sẽ được áp dụng hai phong cách kiến trúc (Architectura
 - Đánh đổi hợp lý so với Microservices: Dù kiến trúc Microservices mang lại khả năng mở rộng (Scalability) lớn, nhưng lại đi kèm với độ phức tạp khổng lồ về quản lý hạ tầng và phân tán dữ liệu (Distributed System Complexity). Với quy mô đồ án môn học và quỹ thời gian giới hạn, việc xây dựng một hệ thống Modular Monolith bằng Spring Boot là giải pháp mang lại hiệu quả cao nhất. Khối backend vẫn được chia module rõ ràng, tạo tiền đề để có thể dễ dàng tách thành các service độc lập trong tương lai nếu dự án mở rộng.
 
 ## 4. Hệ quả:
-- Tích cực: Dễ dàng kiểm thử (Testing) từng tầng (ví dụ: viết Unit Test riêng cho Business Layer mà không cần đụng đến Database). Quá trình CI/CD và Dockerize đơn giản với một container backend duy nhất.
+- Ưu điểm: 
+1. Tách biệt rõ ràng: Dễ hiểu, dễ quản lý vì mỗi lớp có nhiệm vụ riêng. Giảm sự phụ thuộc.
+2. Dễ bảo trì: Thay đổi ở một lớp(VD: Thay đổi UI) ít ảnh hưởng đến lớp Logic hay Database.
+3. Dễ kiểm thử: Có thể viết Unit Test độc lập cho từng lớp bằng cách Mock các lớp phụ thuộc.
+4. Tái sử dụng: Lớp Business Logic có thể được dùng chung cho cả Web UI và Mobile UI.
+5. Dễ tiếp cận: Cấu trúc tự nhiên, phù hợp cho người mới và các dự án nhỏ.
 
-- Tiêu cực: Khi hệ thống phình to với hàng trăm tính năng, việc build và deploy toàn bộ backend cho một sửa đổi nhỏ có thể tốn thời gian. (Tuy nhiên, rủi ro này nằm ngoài phạm vi giới hạn của đồ án hiện tại).
+- Nhược điểm:
+1. Hiệu suất: Dữ liệu phải đi qua nhiều lớp trung gian gây tăng độ trễ(latency). Overhead do quá trình abstraction.
+2. Architecture Sinkhole: Một anti-pattern phổ biến khi các request đơn giản( như lấy dữ liệu hiển thị) vẫn phải đi qua tất cả các lớp mà không có logic xử lý thêm, gây lãng phí code.
+3. Độ phức tạp: Có thể là "Over-engineer" đối với các ứng dụng quá đơn giản.
+4. Khó mở rộng: Khó scale theo chiều ngang. Thường phải scale toàn bộ ứng dụng nguyên khối(monolith).
 
 ## 5. Kế hoạch định hướng tương lai: Lộ trình chuyển đổi sang Microservices
 Mặc dù kiến trúc Modular Monolith dựa trên Spring Boot là lựa chọn tối ưu cho giai đoạn hiện tại, hệ thống được thiết kế với tư duy mở (Future-proof) để sẵn sàng chuyển đổi sang Microservices khi ứng dụng đạt đến các giới hạn về quy mô.
