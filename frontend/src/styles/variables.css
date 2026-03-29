@@ -1,0 +1,22 @@
+:root {
+    --background: #FFF7ED;
+    --foreground: #1E293B;
+    --card: #FFFFFF;
+    --primary: #F97316;
+    --secondary: #FEF3C7;
+    --muted: #F1F5F9;
+    --border: rgba(0, 0, 0, 0.08);
+
+    --pastel-blue: #FFE0CC;
+    --pastel-yellow: #FFF3B0;
+    --pastel-purple: #FFD6E0;
+
+    --available: #FFEAD5;
+    --selected: #F97316;
+    --booked: #E5E7EB;
+
+    --bs-primary: #F97316;
+    --bs-border-color: rgba(0, 0, 0, 0.08);
+    --bs-body-bg: #FFF7ED;
+    --bs-body-color: #1E293B;
+}
