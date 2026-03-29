@@ -1,0 +1,129 @@
+package duckie.example.backend.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import duckie.example.backend.dto.UserPatchRequest;
+import duckie.example.backend.dto.UserRequest;
+import duckie.example.backend.dto.UserResponse;
+import duckie.example.backend.entity.Role;
+import duckie.example.backend.entity.User;
+import duckie.example.backend.entity.UserStatus;
+import duckie.example.backend.exception.DuplicateResourceException;
+import duckie.example.backend.repository.UserRepository;
+
+@Service
+public class UserService implements IUserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> findAll() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(userMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+   
+    @Transactional(readOnly = true)
+    public Page<UserResponse> findAll(String search, Role role, Pageable pageable) {
+        String roleParam = role != null ? role.name() : null;
+        Page<User> page = userRepository.findAllBySearchAndRole(search, role, pageable);
+        return page.map(userMapper::toResponse);
+    }
+
+    @Transactional
+    public UserResponse findById(Long id){
+        User user=userRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("User not found by Id: "+id));
+        return userMapper.toResponse(user);
+    }
+
+    @Transactional()
+    public UserResponse create(UserRequest request) {
+        if (userRepository.existsByUsername(request.username())) {
+            throw new DuplicateResourceException("Username already exists");
+        }
+
+        if (userRepository.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("Email already exists");
+        }
+
+        User user = User.builder()
+                .username(request.username())
+                .fullname(request.fullname())
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
+                .role(Role.USER)
+                .status(UserStatus.ACTIVE)
+                .build();
+        user = userRepository.save(user);
+        logger.info("Created new user with id: {}", user.getId());
+        return userMapper.toResponse(user);
+    }
+
+    @Transactional()
+    public UserResponse patchUpdate(Long id, UserRequest request){
+        User user=userRepository.findById(id)
+            .orElseThrow(()->new RuntimeException("User not found  by Id:"+id));
+
+        if (request.email() != null && !request.email().isBlank()) { 
+            user.setEmail(request.email());
+        }
+        if (request.password() != null && !request.password().isBlank()) { 
+            user.setPassword(passwordEncoder.encode(request.password()));
+        }
+        if (request.role() != null) {
+            user.setRole(request.role());
+        }
+
+        user = userRepository.save(user);
+        return userMapper.toResponse(user);
+    }
+
+    @Transactional()
+    public void delete(Long id) {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("User not found by Id: " + id));
+    user.setStatus(UserStatus.UNACTIVE); 
+    userRepository.save(user);
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> update(Long id, UserRequest request) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> patch(Long id, UserRequest request) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> patchUpdate(Long id, UserPatchRequest request) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    
+
+    
+}
