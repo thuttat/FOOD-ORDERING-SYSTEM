@@ -12,7 +12,7 @@
 | Thành viên | MSSV | Công việc | Link Commit/PR |
 |------------|------|-----------|----------------|
 | **Trịnh Thị Anh Thư** | 2351010205 | Vẽ sơ đồ Database Schema (ERD) cho toàn bộ hệ thống. Tạo thư mục `db/` và viết file script `init.sql` để khởi tạo các bảng (Users, Restaurants, Categories, Menu, Orders) và insert dữ liệu mẫu, hoàn thiện entity| [4ab5d28](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/4ab5d289b28c0c1fe5fa86dcadf4535efeb0584a) |
-| **Lê Hoàng Bảo Trân** | 2351010214 | Thiết kế bộ tài liệu RESTful API (API Design). Định nghĩa rõ HTTP Method, Endpoints và cấu trúc JSON Response cho các chức năng. Thiết lập quy chuẩn Error Handling (các mã lỗi 400, 401, 403, 404, 500),tạo môi trường frontend và UI. | [74bc54e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM) |
+| **Lê Hoàng Bảo Trân** | 2351010214 | Thiết kế bộ tài liệu RESTful API (API Design). Định nghĩa rõ HTTP Method, Endpoints và cấu trúc JSON Response cho các chức năng. Thiết lập quy chuẩn Error Handling (các mã lỗi 400, 401, 403, 404, 500),tạo môi trường frontend và UI. | [f4df051](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/f4df05196850c4f76d414d28d7a333fd680bf681) |
 | **Nguyễn Triệu Duy** | 2351010036 | Khởi tạo thành công project Backend bằng Spring Boot, cấu hình kết nối với MySQL. Code class Entity User ánh xạ với Database và hoàn thành luồng logic cơ bản (Controller, Service, Repository) cho phần Đăng nhập/Đăng ký. | [c48ddcd](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/c48ddcd47b43d7cd82641f87dc3e27c4c4ab0c08) | 
 
 ---
