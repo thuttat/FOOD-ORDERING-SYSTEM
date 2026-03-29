@@ -10,15 +10,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "users", indexes = {
     @Index(name = "idx_users_email", columnList = "email", unique = true)
 })
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,56 +39,31 @@ public class User {
     private Role role; 
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable=false)
+    @Column(nullable = false)
     private UserStatus status;
 
-    @Column(name="created_at", updatable=false)
-    private Instant createdAt;
-
-    @Column(name="updated_at",updatable=true)
-    private Instant updatedAt;
-
-
     public User() {}
-    
-    @PrePersist
-    protected void onCreate() {
-        Instant now = Instant.now();
-        if (this.createdAt == null) {
-            this.createdAt = now;
-        }
-        if(this.updatedAt == null) {
-            this.updatedAt = now;
-        }
-    }
-    
-    @PreUpdate
-    protected void onUpdate(){
-        this.updatedAt = Instant.now();
-    }
+
 
     public Long getId() { 
         return id; 
     }
-    public void setId(Long id) {
+    public void setId(Long id) { 
         this.id = id; 
     }
-
-    public String getFullname() {
+    public String getFullname() { 
         return fullname; 
     }
     public void setFullname(String fullname) { 
         this.fullname = fullname; 
     }
-
-    public String getUsername() {
+    public String getUsername() { 
         return username; 
     }
-    public User setUsername(String username) { 
+    public void setUsername(String username) { 
         this.username = username; 
-        return this;
     }
-    public String getEmail() {
+    public String getEmail() { 
         return email; 
     }
     public void setEmail(String email) { 
@@ -99,7 +72,7 @@ public class User {
     public String getPassword() { 
         return password; 
     }
-    public void setPassword(String password) {
+    public void setPassword(String password) { 
         this.password = password; 
     }
     public Role getRole() { 
@@ -114,26 +87,11 @@ public class User {
     public void setStatus(UserStatus status) { 
         this.status = status; 
     }
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
-    
 
     public static UserBuilder builder() { 
         return new UserBuilder(); 
     }
-
-
 
     public static final class UserBuilder {
         private Long id;
@@ -147,47 +105,35 @@ public class User {
         private Instant updatedAt;
 
         public UserBuilder id(Long id) { 
-            this.id = id; 
-            return this; 
+            this.id = id; return this; 
         }
         public UserBuilder fullname(String fullname) { 
-            this.fullname = fullname; 
-            return this; 
+            this.fullname = fullname; return this; 
         }
         public UserBuilder username(String username) { 
-            this.username = username; 
-            return this; 
+            this.username = username; return this; 
         }
         public UserBuilder email(String email) { 
-            this.email = email; 
-            return this; 
+            this.email = email; return this; 
         }
         public UserBuilder password(String password) { 
-            this.password = password; 
-            return this; 
+            this.password = password; return this; 
         }
         public UserBuilder role(Role role) { 
-            this.role = role; 
-            return this; 
+            this.role = role; return this; 
         }
         public UserBuilder status(UserStatus status) { 
-            this.status = status; 
-            return this; 
+            this.status = status; return this; 
         }
-        public UserBuilder createdAt(Instant createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-        
-        public UserBuilder updatedAt(Instant updatedAt) {
-            this.updatedAt = updatedAt;
-            return this;
-        }
+        public UserBuilder createdAt(Instant createdAt) { 
+            this.createdAt = createdAt; return this; }
+        public UserBuilder updatedAt(Instant updatedAt) { 
+            this.updatedAt = updatedAt; return this; }
 
         public User build() {
             User user = new User();
             user.setId(this.id);
-            user.setFullname(fullname);
+            user.setFullname(this.fullname);
             user.setUsername(this.username);
             user.setEmail(this.email);
             user.setPassword(this.password);
