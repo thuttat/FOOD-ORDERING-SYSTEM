@@ -25,7 +25,16 @@ Hệ thống đặt món ăn (Food Ordering System) là một ứng dụng web f
 - Container: Docker + Docker Compose
 
 ## Kiến trúc
-[Mô tả kiến trúc đã chọn] ![Architecture](docs/architecture/c4-container.png)
+Dự án áp dụng mô hình **Modular Monolith** kết hợp với kiến trúc **Client-Server**, được thiết kế nhằm đảm bảo sự phân tách trách nhiệm (Separation of Concerns), dễ dàng bảo trì và sẵn sàng mở rộng trong tương lai (Future-proof):
+
+* **Frontend (Client - React SPA):** Hệ thống phía người dùng được xây dựng dưới dạng một Single Page Application (SPA) duy nhất bằng **React.js**. Ứng dụng tích hợp cơ chế điều hướng theo quyền (Role-based routing) để cung cấp các không gian làm việc độc lập, bảo mật cho 3 đối tượng người dùng: *Khách hàng*, *Nhà hàng* và *Admin*.
+* **Backend (Server - Spring Boot):** Đóng vai trò là trung tâm xử lý dữ liệu, cung cấp các RESTful APIs. Mã nguồn được thiết kế theo **Kiến trúc phân tầng (Layered Architecture)** chuẩn mực:
+    * `Controller`: Tiếp nhận request và định tuyến API.
+    * `Service`: Xử lý logic nghiệp vụ cốt lõi (Order, Payment, User...).
+    * `Repository`: Quản lý giao tiếp với cơ sở dữ liệu.
+* **Infrastructure & Integration:** Dữ liệu được lưu trữ tập trung tại **MySQL**. Ngoài ra, hệ thống tích hợp **RabbitMQ** (Message Broker) để xử lý các tác vụ bất đồng bộ (như gửi email, thông báo), giúp tối ưu hóa thời gian phản hồi của API.
+
+![Architecture](docs/architecture/c4-container.png)
 
 ## Cài đặt và chạy
 ### Yêu cầu
