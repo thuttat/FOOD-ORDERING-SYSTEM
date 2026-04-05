@@ -23,7 +23,7 @@ public class Category extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = duckie.example.backend.entity.Restaurant.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
@@ -62,7 +62,9 @@ public class Category extends BaseEntity {
 
     public static final class CategoryBuilder {
         private Long id;
-        private Restaurant restaurant;
+        
+        private duckie.example.backend.entity.Restaurant restaurant; 
+        
         private String name;
         private Instant createdAt;
         private Instant updatedAt;
@@ -72,7 +74,7 @@ public class Category extends BaseEntity {
             return this; 
         }
 
-        public CategoryBuilder restaurant(Restaurant restaurant) { 
+        public CategoryBuilder restaurant(duckie.example.backend.entity.Restaurant restaurant) { 
             this.restaurant = restaurant; 
             return this; 
         }
