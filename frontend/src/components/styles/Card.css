@@ -1,0 +1,22 @@
+.card {
+    background: var(--card);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s;
+}
+
+.card-hover:hover {
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    cursor: pointer;
+}
+
+.card-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.card-content {
+    padding: 16px;
+}
