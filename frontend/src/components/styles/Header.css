@@ -1,0 +1,118 @@
+.header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+}
+
+.header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--foreground);
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--available);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.logo-text {
+    font-size: 18px;
+}
+
+.search-bar {
+    flex: 1;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--muted);
+    padding: 8px 12px;
+    border-radius: 999px;
+}
+
+.search-bar input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 14px;
+}
+
+.nav {
+    display: flex;
+    gap: 12px;
+}
+
+.nav-btn {
+    text-decoration: none;
+    color: var(--foreground);
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.nav-btn:hover {
+    background: var(--secondary);
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.cart {
+    position: relative;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.cart:hover {
+    background: var(--secondary);
+}
+
+.cart-badge {
+    position: absolute;
+    top: -4px;
+    right: -6px;
+    background: var(--primary);
+    color: white;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 999px;
+}
+
+.user-info {
+    text-align: right;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.text-muted {
+    color: #6b7280;
+}

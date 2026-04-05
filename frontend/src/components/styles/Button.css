@@ -1,0 +1,31 @@
+.btn {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-outline {
+    border: 1px solid var(--border);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background: var(--muted);
+}
+
+.btn-danger {
+    background: #ef4444 !important;
+    color: white;
+}
