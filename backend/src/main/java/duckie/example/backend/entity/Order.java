@@ -91,6 +91,14 @@ public class Order extends BaseEntity {
         this.totalAmount = totalAmount; 
     }
 
+    public BigDecimal getDeliveryFee() { 
+        return deliveryFee; 
+    }
+
+    public void setDeliveryFee(BigDecimal deliveryFee) { 
+        this.deliveryFee = deliveryFee; 
+    }
+
     public OrderStatus getStatus() { 
         return status; 
     }
@@ -105,6 +113,14 @@ public class Order extends BaseEntity {
 
     public void setDeliveryAddress(String deliveryAddress) { 
         this.deliveryAddress = deliveryAddress; 
+    }
+
+    public String getCustomerNote() { 
+        return customerNote; 
+    }
+
+    public void setCustomerNote(String customerNote) { 
+        this.customerNote = customerNote; 
     }
 
     public List<OrderItem> getItems() { 
@@ -124,8 +140,10 @@ public class Order extends BaseEntity {
         private User customer;
         private Restaurant restaurant;
         private BigDecimal totalAmount;
+        private BigDecimal deliveryFee;
         private OrderStatus status;
         private String deliveryAddress;
+        private String customerNote;
         private List<OrderItem> items;
         private Instant createdAt;
         private Instant updatedAt;
@@ -150,6 +168,11 @@ public class Order extends BaseEntity {
             return this; 
         }
 
+        public OrderBuilder deliveryFee(BigDecimal deliveryFee) { 
+            this.deliveryFee = deliveryFee; 
+            return this; 
+        }
+
         public OrderBuilder status(OrderStatus status) { 
             this.status = status; 
             return this; 
@@ -157,6 +180,11 @@ public class Order extends BaseEntity {
 
         public OrderBuilder deliveryAddress(String deliveryAddress) { 
             this.deliveryAddress = deliveryAddress; 
+            return this; 
+        }
+
+        public OrderBuilder customerNote(String customerNote) { 
+            this.customerNote = customerNote; 
             return this; 
         }
 
@@ -181,8 +209,10 @@ public class Order extends BaseEntity {
             order.setCustomer(this.customer);
             order.setRestaurant(this.restaurant);
             order.setTotalAmount(this.totalAmount);
+            order.setDeliveryFee(this.deliveryFee);
             order.setStatus(this.status);
             order.setDeliveryAddress(this.deliveryAddress);
+            order.setCustomerNote(this.customerNote);
             order.setItems(this.items);
             order.setCreatedAt(this.createdAt);
             order.setUpdatedAt(this.updatedAt);
