@@ -23,7 +23,6 @@ public class OrderMapper {
     public OrderMapper(OrderItemMapper orderItemMapper) {
         this.orderItemMapper = orderItemMapper;
     }
-
     public Order toEntity(OrderRequest request, User customer, Restaurant restaurant) {
         if (request == null) {
             return null;
