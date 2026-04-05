@@ -11,7 +11,7 @@
 
 | Thành viên | MSSV | Công việc | Link Commit/PR |
 |------------|------|-----------|----------------|
-| **Trịnh Thị Anh Thư** | 2351010205 | Code hoàn thiện các API Backend (Spring Boot) cho luồng Khách hàng: API lấy danh sách nhà hàng/thực đơn, API Quản lý Giỏ hàng (UC-1) và API Đặt hàng | [e]() |
+| **Trịnh Thị Anh Thư** | 2351010205 | Code hoàn thiện các API Backend (Spring Boot) cho luồng Khách hàng: API lấy danh sách nhà hàng/thực đơn, API Quản lý Giỏ hàng (UC-1) và API Đặt hàng | [e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/cf9cb66a6aa13260c6f86faf63d87c691e70c462) |
 | **Lê Hoàng Bảo Trân** | 2351010214 | Code API Backend (Spring Boot) cho luồng Admin: API lấy danh sách nhà hàng chờ duyệt, API duyệt/khóa tài khoản, API thống kê hệ thống. | [e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/59f002f71f373048f3bcd3b5d710e4ef584c444a)|
 | **Nguyễn Triệu Duy** | 2351010036 | CCode API Backend cho luồng Nhà hàng: Quản lý Menu (thêm/sửa/xóa món), Cập nhật trạng thái đơn hàng. Tích hợp thử RabbitMQ cho chức năng thông báo đơn hàng mới | [e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/231e81045243e40e418484135023c273e49e503c) | 
 
