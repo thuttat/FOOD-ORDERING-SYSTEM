@@ -42,6 +42,7 @@
 .stat-value {
     font-size: 24px;
     color: var(--foreground);
+    font-weight: 500;
 }
 
 .stat-growth {

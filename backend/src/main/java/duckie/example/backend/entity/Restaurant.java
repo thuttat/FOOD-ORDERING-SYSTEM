@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "restaurants", indexes = {
-        @Index(name = "idx_restaurant_owner", columnList = "owner_id")
+        @Index(name = "idx_restaurant_user", columnList = "user_id")
 })
 public class Restaurant extends BaseEntity {
 

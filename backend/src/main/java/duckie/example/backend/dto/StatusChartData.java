@@ -1,7 +1,9 @@
 package duckie.example.backend.dto;
 
+import duckie.example.backend.entity.OrderStatus;
+
 public record StatusChartData(
-        String status,
+        OrderStatus status,
         long count
 ) {
 }

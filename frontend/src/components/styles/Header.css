@@ -64,15 +64,24 @@
 }
 
 .nav-btn {
+    padding: 8px 14px;
+    border-radius: 12px;
     text-decoration: none;
-    color: var(--foreground);
-    padding: 6px 10px;
-    border-radius: 8px;
+    color: black;
     transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .nav-btn:hover {
-    background: var(--secondary);
+    background: var(--muted);
+    border: 1px solid var(--primary);
+}
+
+.nav-btn.active {
+    background: var(--primary);
+    color: white;
 }
 
 .user-section {

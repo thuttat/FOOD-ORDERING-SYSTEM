@@ -1,9 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
+import {Link, NavLink, useNavigate} from "react-router-dom";
 import { Button } from "./Button.jsx";
-import { ShoppingCart, Search } from "lucide-react";
+import {ShoppingCart, Search, Bell, House, ChefHat, NotepadText} from "lucide-react";
 import "./../styles/Header.css";
 
-export function Header() {
+export function Header({
+                           role = "CUSTOMER",
+                           showSearch = false,
+                           showNav = false,
+                           showCart = false,
+                       }) {
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -11,33 +16,53 @@ export function Header() {
         navigate("/login");
     };
 
+    const getHomePath = () => {
+        if (role === "ADMIN") return "/admin";
+        if (role === "RESTAURANT") return "/restaurant";
+        return "/";
+    };
+
     return (
         <header className="header">
             <div className="header-inner container">
-                <Link to="/" className="logo">
+                <Link to={getHomePath()} className="logo">
                     <div className="logo-icon">😋</div>
                     <span className="logo-text">HappyFood</span>
                 </Link>
 
-                <div className="search-bar">
-                    <Search size={18} />
-                    <input
-                        type="text"
-                        placeholder="Search for food, restaurants..."
-                    />
-                </div>
+                {showSearch && (
+                    <div className="search-bar">
+                        <Search size={18} />
+                        <input placeholder="Search for food, restaurants..." />
+                    </div>
+                )}
 
-                <nav className="nav">
-                    <Link to="/" className="nav-btn">Home</Link>
-                    <Link to="/restaurants" className="nav-btn">Restaurants</Link>
-                    <Link to="/orders" className="nav-btn">Orders</Link>
-                </nav>
+                {showNav && (
+                    <nav className="nav">
+                        <NavLink to="/" className={({ isActive }) =>
+                            isActive ? "nav-btn active" : "nav-btn"
+                        }><House size={20} strokeWidth={1.75} /> Home</NavLink>
+                        <NavLink to="/restaurants" className={({ isActive }) =>
+                            isActive ? "nav-btn active" : "nav-btn"
+                        }><ChefHat size={20} strokeWidth={1.75} /> Restaurants</NavLink>
+                        <NavLink to="/orders" className={({ isActive }) =>
+                            isActive ? "nav-btn active" : "nav-btn"
+                        }><NotepadText size={20} strokeWidth={1.75} /> Orders</NavLink>
+                    </nav>
+                )}
 
                 <div className="user-section">
-                    <div className="cart" onClick={() => navigate("/cart")}>
-                        <ShoppingCart size={20} />
-                        <span className="cart-badge">2</span>
+                    <div className="notification">
+                        <Bell size={20} />
+                        <span className="notification-badge">3</span>
                     </div>
+
+                    {showCart && (
+                        <div className="cart" onClick={() => navigate("/cart")}>
+                            <ShoppingCart size={20} />
+                            <span className="cart-badge">2</span>
+                        </div>
+                    )}
 
                     <div className="user-info">
                         <div className="user-name">John Doe</div>
