@@ -23,18 +23,18 @@ public class OrderService {
     @Transactional
     public Order updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng có ID: " + orderId));
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
 
         order.setStatus(newStatus);
         Order savedOrder = orderRepository.save(order);
-        String message = String.format("Đơn hàng #%d đã chuyển sang trạng thái: %s", savedOrder.getId(), newStatus.name());
+        String message = String.format("Order #%d status updated to: %s", savedOrder.getId(), newStatus.name());
         
         rabbitTemplate.convertAndSend(
             RabbitMQConfig.EXCHANGE_ORDER, 
             RabbitMQConfig.ROUTING_KEY_ORDER, 
             message
         );
-        System.out.println(" Đã gửi thông báo vào RabbitMQ: " + message);
+        System.out.println(" Notification sent to RabbitMQ: " + message);
         return savedOrder;
     }
 }

@@ -55,8 +55,11 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN") 
 
-                        .requestMatchers("/api/menu/**").permitAll()
-                        .requestMatchers("/api/orders/**").permitAll()
+                        
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions
