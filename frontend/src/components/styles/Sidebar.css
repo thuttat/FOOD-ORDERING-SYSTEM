@@ -1,0 +1,33 @@
+.sidebar {
+    width: 220px;
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--foreground);
+    transition: 0.2s;
+}
+
+.sidebar-item:hover {
+    background: var(--secondary);
+}
+
+.sidebar-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+.icon {
+    display: flex;
+}

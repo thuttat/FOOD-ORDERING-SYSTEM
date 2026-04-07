@@ -5,33 +5,6 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
 }
 
-
-.header {
-  background: white;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.nav {
-  display: flex;
-  gap: 8px;
-}
-
-.nav-btn {
-  padding: 8px 14px;
-  border-radius: 12px;
-  text-decoration: none;
-  color: black;
-  transition: 0.2s;
-}
-
-.nav-btn:hover {
-  background: var(--muted);
-  border: 1px solid var(--primary);
-}
-
 .footer {
   margin-top: auto;
   text-align: center;
@@ -189,3 +162,41 @@ body {
   margin-top: 20px;
 }
 
+.layout {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-wrapper {
+  padding: 24px;
+  flex: 1;
+}
+
+.notification {
+  position: relative;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+.notification:hover {
+  background: var(--secondary);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  background: var(--primary);
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+}

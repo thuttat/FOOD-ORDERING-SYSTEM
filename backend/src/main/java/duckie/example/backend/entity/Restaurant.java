@@ -4,6 +4,8 @@ import java.time.Instant;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,13 +33,24 @@ public class Restaurant extends BaseEntity {
     @Column(nullable = false, length = 200)
     private String name;
 
+    @Column(nullable = false)
     private String address;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "is_open")
     private Boolean isOpen;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RestaurantStatus status;
 
     public Restaurant() {}
 
@@ -73,6 +86,14 @@ public class Restaurant extends BaseEntity {
         this.address = address; 
     }
 
+    public String getPhoneNumber() { 
+        return phoneNumber; 
+    }
+
+    public void setPhoneNumber(String phoneNumber) { 
+        this.phoneNumber = phoneNumber; 
+    }
+
     public String getDescription() { 
         return description; 
     }
@@ -81,12 +102,28 @@ public class Restaurant extends BaseEntity {
         this.description = description; 
     }
 
+    public String getImageUrl() { 
+        return imageUrl; 
+    }
+
+    public void setImageUrl(String imageUrl) { 
+        this.imageUrl = imageUrl; 
+    }
+
     public Boolean getIsOpen() { 
         return isOpen; 
     }
 
     public void setIsOpen(Boolean isOpen) { 
         this.isOpen = isOpen; 
+    }
+
+    public RestaurantStatus getStatus() { 
+        return status; 
+    }
+
+    public void setStatus(RestaurantStatus status) { 
+        this.status = status; 
     }
 
     public static RestaurantBuilder builder() { 
@@ -98,8 +135,11 @@ public class Restaurant extends BaseEntity {
         private User owner;
         private String name;
         private String address;
+        private String phoneNumber;
         private String description;
+        private String imageUrl;
         private Boolean isOpen;
+        private RestaurantStatus status;
         private Instant createdAt;
         private Instant updatedAt;
 
@@ -123,13 +163,28 @@ public class Restaurant extends BaseEntity {
             return this; 
         }
 
+        public RestaurantBuilder phoneNumber(String phoneNumber) { 
+            this.phoneNumber = phoneNumber; 
+            return this; 
+        }
+
         public RestaurantBuilder description(String description) { 
             this.description = description; 
             return this; 
         }
 
+        public RestaurantBuilder imageUrl(String imageUrl) { 
+            this.imageUrl = imageUrl; 
+            return this; 
+        }
+
         public RestaurantBuilder isOpen(Boolean isOpen) { 
             this.isOpen = isOpen; 
+            return this; 
+        }
+
+        public RestaurantBuilder status(RestaurantStatus status) { 
+            this.status = status; 
             return this; 
         }
 
@@ -149,8 +204,11 @@ public class Restaurant extends BaseEntity {
             restaurant.setOwner(this.owner);
             restaurant.setName(this.name);
             restaurant.setAddress(this.address);
+            restaurant.setPhoneNumber(this.phoneNumber);
             restaurant.setDescription(this.description);
+            restaurant.setImageUrl(this.imageUrl);
             restaurant.setIsOpen(this.isOpen);
+            restaurant.setStatus(this.status);
             restaurant.setCreatedAt(this.createdAt);
             restaurant.setUpdatedAt(this.updatedAt);
             return restaurant;
