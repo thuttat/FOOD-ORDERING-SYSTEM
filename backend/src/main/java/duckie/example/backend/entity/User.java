@@ -42,6 +42,9 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserStatus status;
 
+    @Column(name = "phone")
+    private String phone;
+
     public User() {}
 
 
@@ -88,6 +91,13 @@ public class User extends BaseEntity {
         this.status = status; 
     }
 
+    public String getPhone() {
+        return phone;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
 
     public static UserBuilder builder() { 
         return new UserBuilder(); 
@@ -103,6 +113,8 @@ public class User extends BaseEntity {
         private UserStatus status;
         private Instant createdAt;
         private Instant updatedAt;
+        private String phone;
+
 
         public UserBuilder id(Long id) { 
             this.id = id; return this; 
@@ -126,9 +138,14 @@ public class User extends BaseEntity {
             this.status = status; return this; 
         }
         public UserBuilder createdAt(Instant createdAt) { 
-            this.createdAt = createdAt; return this; }
+            this.createdAt = createdAt; return this; 
+        }
         public UserBuilder updatedAt(Instant updatedAt) { 
-            this.updatedAt = updatedAt; return this; }
+            this.updatedAt = updatedAt; return this; 
+        }
+        public UserBuilder phone(String phone) { 
+            this.phone = phone; return this; 
+        }
 
         public User build() {
             User user = new User();
@@ -141,6 +158,7 @@ public class User extends BaseEntity {
             user.setStatus(this.status);
             user.setCreatedAt(this.createdAt);
             user.setUpdatedAt(this.updatedAt);
+            user.setPhone(this.phone);
             return user;
         }
     }

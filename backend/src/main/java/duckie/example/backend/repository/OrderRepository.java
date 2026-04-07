@@ -14,12 +14,8 @@ import duckie.example.backend.entity.Order;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-
     List<Order> findByCustomerId(Long customerId);
-
     List<Order> findByRestaurantId(Long restaurantId);
-
-
     @Query("SELECT new duckie.example.backend.dto.StatusChartData(o.status, COUNT(o)) " +
            "FROM Order o WHERE month(o.createdAt) = month(current_date) " +
            "GROUP BY o.status")
