@@ -14,8 +14,8 @@ INSERT INTO users (id, fullname, username, email, password, role, status, phone)
 (3, 'Chủ Quán Burger', 'nhahang1', 'contact@burgerking.com', '123456', 'RESTAURANT', 'ACTIVE', '0923456789');
 
 -- 2. Bảng Restaurant 
-INSERT INTO restaurants (id, name, address, phone, is_active) VALUES
-(1, 'Burger King Quận 1', '123 Nguyễn Huệ, Quận 1', '0923456789', true);
+INSERT INTO restaurants (id, user_id, name, address, phone_number, is_open, status) VALUES
+(1, 3, 'Burger King Quận 1', '123 Nguyễn Huệ, Quận 1', '0923456789', true, 'ACTIVE');
 
 -- 3. Bảng Categories
 INSERT INTO categories (id, restaurant_id, name) VALUES

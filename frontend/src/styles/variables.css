@@ -1,17 +1,17 @@
 :root {
-    --background: #f6f6f6;
+    --background: #F8FAFC;
     --foreground: #1E293B;
     --card: #FFFFFF;
     --primary: #F97316;
     --secondary: #FEF3C7;
     --muted: #F1F5F9;
-    --border: rgba(0, 0, 0, 0.08);
+   --border: #e2e8f0;
 
     --pastel-blue: #FFE0CC;
     --pastel-yellow: #FFF3B0;
     --pastel-purple: #FFD6E0;
 
-    --available: #FFEAD5;
+    --available:#FFF2E5;
     --selected: #F97316;
     --booked: #E5E7EB;
 
@@ -19,4 +19,6 @@
     --bs-border-color: rgba(0, 0, 0, 0.08);
     --bs-body-bg: #FFF7ED;
     --bs-body-color: #1E293B;
+
 }
+

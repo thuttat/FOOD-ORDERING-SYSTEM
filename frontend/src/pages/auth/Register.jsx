@@ -36,6 +36,7 @@ export function Register() {
                 email: formData.email,
                 password: formData.password,
                 fullname: formData.fullname,
+                role: formData.role,
             };
 
             const response = await axios.post("http://localhost:8080/api/auth/register", payloadToSend);
@@ -128,6 +129,18 @@ export function Register() {
                                 onChange={handleChange}
                                 required
                             />
+                        </div>
+                        <div className="form-group">
+                            <label>I want to register as</label>
+                            <select
+                                className="input"
+                                name="role"
+                                value={formData.role}
+                                onChange={handleChange}
+                            >
+                                <option value="USER">Customer (Order Food)</option>
+                                <option value="RESTAURANT">Restaurant Owner (Sell Food)</option>
+                            </select>
                         </div>
                         <Button type="submit" className="btn-primary">Sign Up</Button>
                     </form>
