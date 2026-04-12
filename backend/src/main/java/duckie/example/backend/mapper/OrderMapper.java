@@ -1,18 +1,19 @@
-package duckie.example.backend.service;
-
-import org.springframework.stereotype.Component;
-import duckie.example.backend.dto.OrderRequest;
-import duckie.example.backend.dto.OrderResponse;
-import duckie.example.backend.dto.OrderItemResponse;
-import duckie.example.backend.entity.Order;
-import duckie.example.backend.entity.User;
-import duckie.example.backend.entity.Restaurant;
-import duckie.example.backend.entity.OrderStatus;
+package duckie.example.backend.mapper;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
+
+import duckie.example.backend.dto.OrderItemResponse;
+import duckie.example.backend.dto.OrderRequest;
+import duckie.example.backend.dto.OrderResponse;
+import duckie.example.backend.entity.Order;
+import duckie.example.backend.entity.OrderStatus;
+import duckie.example.backend.entity.Restaurant;
+import duckie.example.backend.entity.User;
 
 @Component
 public class OrderMapper {

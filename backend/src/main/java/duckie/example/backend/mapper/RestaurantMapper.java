@@ -1,4 +1,4 @@
-package duckie.example.backend.service;
+package duckie.example.backend.mapper;
 
 import org.springframework.stereotype.Component;
 
@@ -11,9 +11,7 @@ import duckie.example.backend.entity.User;
 @Component
 public class RestaurantMapper {
     public Restaurant toEntity(RestaurantRequest request, User owner) {
-        if (request == null) {
-            return null;
-        }
+        if (request == null) return null;
 
         return Restaurant.builder()
                 .name(request.name())
@@ -27,11 +25,8 @@ public class RestaurantMapper {
                 .build();
     }
 
-
-    public RestaurantResponse toResponse(Restaurant restaurant) {
-        if (restaurant == null) {
-            return null;
-        }
+    public RestaurantResponse toResponse(Restaurant restaurant, Double rating) {
+        if (restaurant == null) return null;
 
         return new RestaurantResponse(
             restaurant.getId(),
@@ -43,6 +38,7 @@ public class RestaurantMapper {
             restaurant.getImageUrl(),
             restaurant.getIsOpen(),
             restaurant.getStatus(),             
+            rating != null ? rating : 0.0, 
             restaurant.getCreatedAt(),
             restaurant.getUpdatedAt()
         );

@@ -20,6 +20,7 @@ import duckie.example.backend.entity.User;
 import duckie.example.backend.entity.UserStatus;
 import duckie.example.backend.exception.DuplicateResourceException;
 import duckie.example.backend.exception.ResourceNotFoundException;
+import duckie.example.backend.mapper.UserMapper;
 import duckie.example.backend.repository.UserRepository;
 import duckie.example.backend.security.JwtService;
 import jakarta.transaction.Transactional;

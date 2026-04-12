@@ -13,15 +13,22 @@ import org.springframework.transaction.annotation.Transactional;
 import duckie.example.backend.config.RabbitMQConfig;
 import duckie.example.backend.dto.OrderRequest;
 import duckie.example.backend.dto.OrderResponse;
-import duckie.example.backend.entity.MenuItem;
+import duckie.example.backend.dto.PaymentRequest;
+import duckie.example.backend.entity.Cart;
+import duckie.example.backend.entity.CartItem;
 import duckie.example.backend.entity.Order;
 import duckie.example.backend.entity.OrderItem;
 import duckie.example.backend.entity.OrderStatus;
+import duckie.example.backend.entity.Payment;
 import duckie.example.backend.entity.Restaurant;
 import duckie.example.backend.entity.User;
-import duckie.example.backend.repository.MenuItemRepository;
+import duckie.example.backend.mapper.OrderItemMapper;
+import duckie.example.backend.mapper.OrderMapper;
+import duckie.example.backend.mapper.PaymentMapper;
+import duckie.example.backend.repository.CartItemRepository;
+import duckie.example.backend.repository.CartRepository;
 import duckie.example.backend.repository.OrderRepository;
-import duckie.example.backend.repository.RestaurantRepository;
+import duckie.example.backend.repository.PaymentRepository;
 
 @Service
 public class OrderService {
@@ -29,23 +36,29 @@ public class OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
-    private final RestaurantRepository restaurantRepository;
-    private final MenuItemRepository menuItemRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final PaymentRepository paymentRepository;
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
+    private final PaymentMapper paymentMapper;
     private final RabbitTemplate rabbitTemplate;
 
     public OrderService(OrderRepository orderRepository, 
-                        RestaurantRepository restaurantRepository,
-                        MenuItemRepository menuItemRepository,
+                        CartRepository cartRepository,
+                        CartItemRepository cartItemRepository,
+                        PaymentRepository paymentRepository,
                         OrderMapper orderMapper,
                         OrderItemMapper orderItemMapper,
+                        PaymentMapper paymentMapper,
                         RabbitTemplate rabbitTemplate) {
         this.orderRepository = orderRepository;
-        this.restaurantRepository = restaurantRepository;
-        this.menuItemRepository = menuItemRepository;
+        this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.paymentRepository = paymentRepository;
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
+        this.paymentMapper = paymentMapper;
         this.rabbitTemplate = rabbitTemplate;
     }
 
@@ -58,33 +71,46 @@ public class OrderService {
 
     @Transactional
     public OrderResponse create(OrderRequest request, User customer) {
-        Restaurant restaurant = restaurantRepository.findById(request.restaurantId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhà hàng"));
+        Cart cart = cartRepository.findByCustomerId(customer.getId())
+                .orElseThrow(() -> new RuntimeException("Giỏ hàng trống!"));
+        
+        List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
+        if (cartItems.isEmpty()) {
+            throw new RuntimeException("Không có món ăn nào trong giỏ để đặt hàng!");
+        }
+ 
+        Restaurant restaurant = cartItems.get(0).getMenuItem().getCategory().getRestaurant();
 
         Order order = orderMapper.toEntity(request, customer, restaurant);
-
         BigDecimal subTotal = BigDecimal.ZERO;
-        
-        for (var itemReq : request.items()) {
-            MenuItem menuItem = menuItemRepository.findById(itemReq.menuItemId())
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy món ăn"));
 
-            OrderItem orderItem = orderItemMapper.toEntity(itemReq, order, menuItem);
+        for (CartItem cItem : cartItems) {
+            OrderItem orderItem = orderItemMapper.fromCartItem(cItem, order);
             order.getItems().add(orderItem);
             
-            BigDecimal itemTotal = menuItem.getPrice().multiply(BigDecimal.valueOf(itemReq.quantity()));
+            BigDecimal itemTotal = orderItem.getUnitPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
             subTotal = subTotal.add(itemTotal);
         }
 
         order.setTotalAmount(subTotal.add(order.getDeliveryFee()));
-        
         order = orderRepository.save(order);
         logger.info("Created new order with id: {}", order.getId());
+
+        Payment payment = paymentMapper.toEntity(
+            new PaymentRequest(order.getId(), request.paymentMethod(), order.getTotalAmount()), 
+            order, 
+            "TXN_" + System.currentTimeMillis()
+        );
+        paymentRepository.save(payment);
+
+        cartItemRepository.deleteByCartId(cart.getId());
+        
         String msg = "New order created: #" + order.getId();
         sendNotification(msg);
         
         return orderMapper.toResponse(order);
     }
+
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
@@ -98,6 +124,7 @@ public class OrderService {
         
         return orderMapper.toResponse(savedOrder);
     }
+
     private void sendNotification(String message) {
         try {
             rabbitTemplate.convertAndSend(

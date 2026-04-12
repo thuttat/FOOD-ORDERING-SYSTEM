@@ -14,7 +14,8 @@ public record RestaurantResponse(
     String imageUrl,
     Boolean isOpen,
     RestaurantStatus status,
+    Double rating, 
     Instant createdAt,
     Instant updatedAt
-) {
-}
+) {}
+
