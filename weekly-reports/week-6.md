@@ -14,7 +14,7 @@ Tuần này, nhóm đã hoàn thành việc đồng bộ hóa và đóng gói to
 | Thành viên | MSSV | Công việc | Trạng thái |
 |------------|------|-----------|------------|
 | **Trịnh Thị Anh Thư** | 2351010205 | Hoàn thiện luồng logic Giỏ hàng (Cart) và Đặt hàng (Order). Tái cấu trúc Mapper/DTO. Bắt đầu dựng UI ReactJS (Trang chủ, Detail quán). |[e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/47e8dead7c882fd7d047cbbdb9d59aab7bd949df) |
-| **Lê Hoàng Bảo Trân** | 2351010214 | Hoàn thiện API Thống kê Dashboard. Cấu trúc lại Repository cho Admin. Dựng UI Frontend luồng Admin. | [e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/af45181f3c48f117e9e0937456d8d0feb674da80) |
+| **Lê Hoàng Bảo Trân** | 2351010214 | Hoàn thiện API Thống kê Dashboard. Cấu trúc lại Repository cho Admin. Dựng UI Frontend luồng Admin. | [e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/c1888bdd216f416602cacf7a69af012715aaa2bb) |
 | **Nguyễn Triệu Duy** | 2351010036 | Hoàn thiện logic thông báo (Notification) qua RabbitMQ. Đồng bộ trạng thái MenuItem. Dựng UI Frontend luồng Nhà hàng. | [e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/5bc59876dcde2aa4a721776ac386121eabfa1e41) |
 
 ---
