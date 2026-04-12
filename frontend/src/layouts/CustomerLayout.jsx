@@ -6,7 +6,7 @@ export function CustomerLayout() {
     return (
         <div>
             <Header
-                role="CUSTOMER"
+                role="USER"
                 showSearch
                 showNav
                 showCart

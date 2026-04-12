@@ -107,6 +107,7 @@ body {
   border-radius: 16px;
   background: var(--card);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .login-header {
@@ -199,4 +200,40 @@ body {
   font-size: 11px;
   padding: 2px 6px;
   border-radius: 999px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title {
+  color: var(--foreground);
+  margin-bottom: 4px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.header-subtitle {
+  color: var(--muted-foreground);
+  margin: 0;
 }

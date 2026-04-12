@@ -1,14 +1,14 @@
 import axios from "axios";
 
+const API_BASE_URL = "http://localhost:8080/api";
+
 const axiosClient = axios.create({
-    baseURL: 'http://localhost:8080',
-    headers: {
-        "Content-Type": "application/json",
-    }
+    baseURL: API_BASE_URL,
+    timeout: 10000,
 });
 
 axiosClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
     }
@@ -24,7 +24,7 @@ axiosClient.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             console.error("Login session is expired! Please sign in again.");
-            localStorage.removeItem("token");
+            localStorage.removeItem("accessToken");
             localStorage.removeItem("role");
             window.location.href = "/";
         }

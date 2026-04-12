@@ -4,64 +4,6 @@
     gap: 24px;
 }
 
-.page-title {
-    color: var(--foreground);
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 24px;
-}
-
-@media (min-width: 640px) {
-    .stats-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (min-width: 1024px) {
-    .stats-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-.stat-card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.stat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--foreground);
-}
-
-.stat-value {
-    font-size: 24px;
-    color: var(--foreground);
-    font-weight: 500;
-}
-
-.stat-growth {
-    font-size: 14px;
-}
-
-.success {
-    color: #10b981;
-}
-
-.primary {
-    color: #ff6b35;
-}
-
-.icon {
-    width: 20px;
-    height: 20px;
-}
-
 .chart-grid {
     display: grid;
     gap: 24px;

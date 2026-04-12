@@ -13,10 +13,10 @@
 }
 
 .card-header {
-    padding: 16px;
+    padding: 14px;
     border-bottom: 1px solid var(--border);
 }
 
 .card-content {
-    padding: 16px;
+    padding: 14px;
 }

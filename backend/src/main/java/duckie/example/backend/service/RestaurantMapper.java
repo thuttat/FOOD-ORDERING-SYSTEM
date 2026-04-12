@@ -38,6 +38,7 @@ public class RestaurantMapper {
             restaurant.getOwner().getId(),
             restaurant.getOwner().getFullname(), 
             restaurant.getName(),
+            restaurant.getPhoneNumber(),
             restaurant.getAddress(),
             restaurant.getDescription(),
             restaurant.getImageUrl(),

@@ -8,7 +8,7 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
-import { Card, CardContent } from "../../../components/common/Card.jsx";
+import { Card, CardContent } from "../../../../components/common/Card.jsx";
 
 export function RevenueChart({ data }) {
     return (

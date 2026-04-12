@@ -1,10 +1,10 @@
 import React from "react";
 import { Users, Store, ShoppingBag, DollarSign } from "lucide-react";
-import { StatsCard } from "./components/StatsCard.jsx";
+import { StatsCard } from "../../../components/common/StatsCard.jsx";
 import { RevenueChart } from "./components/RevenueChart.jsx";
 import { OrdersPieChart } from "./components/OrdersPieChart.jsx";
 import {TopRestaurantsTable} from "./components/TopRestaurantsTable.jsx";
-import "./styles/AdminDashboard.css"
+import "./AdminDashboard.css"
 
 
 const ordersByStatus = [
@@ -32,38 +32,42 @@ export function AdminDashboard() {
     return (
         <div className="container">
             <div className="admin-dashboard">
-                <h1 className="page-title">Admin Dashboard</h1>
+                <h1>Admin Dashboard</h1>
                 <div className="stats-grid">
                     <StatsCard
                         title="Total Users"
                         value="1,234"
-                        growth="+156 this month"
                         icon={<Users />}
-                        iconClass="icon primary"
+                        iconClass="primary"
+                        subtext="+156 this month"
+                        subtextClass="success"
                     />
 
                     <StatsCard
                         title="Restaurants"
                         value="89"
-                        growth="+12 this month"
+                        subtext="+12 this month"
                         icon={<Store />}
-                        iconClass="icon primary"
+                        iconClass="primary"
+                        subtextClass="success"
                     />
 
                     <StatsCard
                         title="Total Orders"
                         value="5,678"
-                        growth="+432 this week"
+                        subtext="+432 this week"
                         icon={<ShoppingBag />}
-                        iconClass="icon primary"
+                        iconClass="primary"
+                        subtextClass="success"
                     />
 
                     <StatsCard
                         title="Revenue"
                         value="$125.4K"
-                        growth="+18% this month"
+                        subtext="+18% this month"
                         icon={<DollarSign />}
-                        iconClass="icon success"
+                        iconClass="success"
+                        subtextClass="success"
                     />
                 </div>
 

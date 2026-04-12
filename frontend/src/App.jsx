@@ -1,56 +1,59 @@
 import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import {Login} from "./pages/auth/Login.jsx";
 import {Register} from "./pages/auth/Register.jsx";
-import {AdminDashboard} from "./pages/admin/AdminDashboard.jsx";
+import {AdminDashboard} from "./pages/admin/AdminDashboard/AdminDashboard.jsx";
 import {AdminLayout} from "./layouts/AdminLayout.jsx";
-import {AdminRestaurants} from "./pages/admin/AdminRestaurants.jsx";
+import {RestaurantsManagement} from "./pages/admin/RestaurantsManagement/RestaurantsManagement.jsx";
 import PrivateRoute from "./pages/auth/PrivateRoute.jsx";
 import {CustomerLayout} from "./layouts/CustomerLayout.jsx";
 import {Home} from "./pages/customer/Home.jsx";
 import {RestaurantLayout} from "./layouts/RestaurantLayout.jsx";
+import {ReviewsManagement} from "./pages/admin/ReviewsManagement/ReviewsManagement.jsx";
+import {AuthProvider} from "./services/AuthContext.jsx";
 
 function App() {
   return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-            <Route
-                element={
-                    <PrivateRoute allowedRoles={["USER"]}>
-                        <CustomerLayout />
-                    </PrivateRoute>
-                }
-            >
-                <Route index element={<Home />} />
-            </Route>
+      <AuthProvider>
+          <BrowserRouter>
+              <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route element={<CustomerLayout />}>
+                      <Route path="/" element={<Home />} />
+                      <Route element={<PrivateRoute allowedRoles={["USER"]} />}>
+                          {/*<Route index element={<Navigate to="/" replace />} />*/}
+                          {/*<Route path="/" element={<Home />} />*/}
+                      </Route>
+                  </Route>
 
-            <Route
-                path="/restaurant/*"
-                element={
-                    <PrivateRoute allowedRoles={["RESTAURANT"]}>
-                        <RestaurantLayout />
-                    </PrivateRoute>
-                }
-            >
-                <Route index element={<Navigate to="dashboard" replace />} />
-                {/*<Route path="dashboard" element={<RestaurantDashboard />} />*/}
-            </Route>
+                  <Route
+                      path="/restaurant/*"
+                      element={
+                          <PrivateRoute allowedRoles={["RESTAURANT"]}>
+                              <RestaurantLayout />
+                          </PrivateRoute>
+                      }
+                  >
+                      <Route index element={<Navigate to="dashboard" replace />} />
+                      {/*<Route path="dashboard" element={<RestaurantDashboard />} />*/}
+                  </Route>
 
-            <Route
-                path="/admin/*"
-                element={
-                    <PrivateRoute allowedRoles={["ADMIN"]}>
-                        <AdminLayout />
-                    </PrivateRoute>
-                }
-            >
-                <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="restaurants" element={<AdminRestaurants />} />
-            </Route>
-        </Routes>
-      </BrowserRouter>
+                  <Route
+                      path="/admin/*"
+                      element={
+                          <PrivateRoute allowedRoles={["ADMIN"]}>
+                              <AdminLayout />
+                          </PrivateRoute>
+                      }
+                  >
+                      <Route index element={<Navigate to="dashboard" replace />} />
+                      <Route path="dashboard" element={<AdminDashboard />} />
+                      <Route path="restaurants" element={<RestaurantsManagement />} />
+                      <Route path="reviews" element={<ReviewsManagement />} />
+                  </Route>
+              </Routes>
+          </BrowserRouter>
+      </AuthProvider>
   );
 }
 

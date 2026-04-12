@@ -8,7 +8,7 @@
 }
 
 .btn-primary {
-    background: var(--primary);
+    background: var(--primary) !important;
     color: white;
 }
 
@@ -18,7 +18,7 @@
 
 .btn-outline {
     border: 1px solid var(--border);
-    background: transparent;
+    background: var(--background);
 }
 
 .btn-outline:hover {
@@ -28,4 +28,42 @@
 .btn-danger {
     background: #ef4444 !important;
     color: white;
+}
+
+.btn-danger:hover {
+    opacity: 0.9;
+}
+
+.btn-approve {
+    background: var(--success) !important;
+    color: white;
+}
+
+.btn-approve:hover {
+    opacity: 0.9;
+}
+
+.back-btn {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted-foreground, #6b7280);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    user-select: none;
+}
+
+.back-btn .action-icon {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s ease;
+}
+
+.back-btn:hover .action-icon {
+    transform: translateX(-4px);
 }

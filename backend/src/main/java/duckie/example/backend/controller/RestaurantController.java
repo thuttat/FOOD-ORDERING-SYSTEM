@@ -65,4 +65,9 @@ public class RestaurantController {
     public ResponseEntity<RestaurantResponse> lockRestaurant(@PathVariable Long id) {
         return ResponseEntity.ok(restaurantService.lockRestaurant(id));
     }
+
+    @PatchMapping("/admin/restaurants/{id}/reinstate")
+    public ResponseEntity<RestaurantResponse> reinstateRestaurant(@PathVariable Long id) {
+        return ResponseEntity.ok(restaurantService.reinstateRestaurant(id));
+    }
 }

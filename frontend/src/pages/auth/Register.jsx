@@ -2,6 +2,7 @@ import {Button} from "../../components/common/Button.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
+import {ChevronLeftIcon} from "lucide-react";
 
 export function Register() {
     const [formData, setFormData] = useState({
@@ -54,6 +55,10 @@ export function Register() {
         <div className="login-page">
             <div className="login-container">
                 <div className="card login-card">
+                    <div className="back-btn" onClick={() => navigate("/")}>
+                        <ChevronLeftIcon className="action-icon" />
+                        <span>Back</span>
+                    </div>
                     <div className="login-header">
                         <div className="login-icon">
                             ✍️

@@ -14,4 +14,5 @@ public interface RestaurantService {
     RestaurantResponse createRestaurant(RestaurantRequest request, boolean isAdminCreated);
     RestaurantResponse approveRestaurant(Long id);
     RestaurantResponse lockRestaurant(Long id);
+    RestaurantResponse reinstateRestaurant(Long id);
 }
