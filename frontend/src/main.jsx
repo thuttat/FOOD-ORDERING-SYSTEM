@@ -4,6 +4,9 @@ import App from "./App";
 import "./styles/variables.css";
 import "./styles/index.css";
 
+import "./styles/tailwind.css"; 
+import "./styles/theme.css"; 
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <App />

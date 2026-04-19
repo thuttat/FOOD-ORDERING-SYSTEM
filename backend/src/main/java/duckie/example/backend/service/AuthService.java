@@ -64,11 +64,13 @@ public class AuthService {
         if(userRepository.existsByEmail(request.email())){
             throw new DuplicateResourceException("Email da ton tai!");
         }
+        Role finalRole = (request.role() == Role.RESTAURANT) ? Role.RESTAURANT : Role.USER;
+
         User user=User.builder().username(request.username())
             .email(request.email())
             .fullname(request.fullname())           
             .password(passwordEncoder.encode(request.password()))
-            .role(request.role() != null ? request.role() : Role.USER)
+            .role(finalRole)
             .status(UserStatus.ACTIVE)
             .build();
         user=userRepository.save(user);

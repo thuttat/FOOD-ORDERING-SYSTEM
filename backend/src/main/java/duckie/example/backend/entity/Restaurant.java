@@ -37,7 +37,7 @@ public class Restaurant extends BaseEntity {
     private String address;
 
     @Column(name = "phone_number", length = 20)
-    private String phoneNumber;
+    private String phone ;
 
     @Column(columnDefinition = "TEXT")
     private String description;
@@ -86,12 +86,12 @@ public class Restaurant extends BaseEntity {
         this.address = address; 
     }
 
-    public String getPhoneNumber() { 
-        return phoneNumber; 
+    public String getphone() { 
+        return phone; 
     }
 
-    public void setPhoneNumber(String phoneNumber) { 
-        this.phoneNumber = phoneNumber; 
+    public void setphone(String phone) { 
+        this.phone= phone; 
     }
 
     public String getDescription() { 
@@ -135,7 +135,7 @@ public class Restaurant extends BaseEntity {
         private User owner;
         private String name;
         private String address;
-        private String phoneNumber;
+        private String phone;
         private String description;
         private String imageUrl;
         private Boolean isOpen;
@@ -161,10 +161,11 @@ public class Restaurant extends BaseEntity {
         public RestaurantBuilder address(String address) { 
             this.address = address; 
             return this; 
+            
         }
 
-        public RestaurantBuilder phoneNumber(String phoneNumber) { 
-            this.phoneNumber = phoneNumber; 
+        public RestaurantBuilder phone(String phone) { 
+            this.phone= phone; 
             return this; 
         }
 
@@ -204,7 +205,7 @@ public class Restaurant extends BaseEntity {
             restaurant.setOwner(this.owner);
             restaurant.setName(this.name);
             restaurant.setAddress(this.address);
-            restaurant.setPhoneNumber(this.phoneNumber);
+            restaurant.setphone(this.phone);
             restaurant.setDescription(this.description);
             restaurant.setImageUrl(this.imageUrl);
             restaurant.setIsOpen(this.isOpen);
