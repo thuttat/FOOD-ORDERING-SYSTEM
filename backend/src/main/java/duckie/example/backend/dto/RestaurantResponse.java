@@ -9,6 +9,7 @@ public record RestaurantResponse(
     Long ownerId,
     String ownerName,
     String name,
+    String phoneNumber,
     String address,
     String phoneNumber, 
     String description,

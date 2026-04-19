@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent } from "../../../components//common/Card.jsx";
+import { Card, CardContent } from "../../../../components/common/Card.jsx";
 
 export function TopRestaurantsTable({ data }) {
     return (

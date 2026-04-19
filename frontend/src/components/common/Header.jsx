@@ -2,17 +2,18 @@ import {Link, NavLink, useNavigate} from "react-router-dom";
 import { Button } from "./Button.jsx";
 import {ShoppingCart, Search, Bell, House, ChefHat, NotepadText} from "lucide-react";
 import "./../styles/Header.css";
+import {useAuth} from "../../services/AuthContext.jsx";
 
 export function Header({
-                           role = "CUSTOMER",
                            showSearch = false,
                            showNav = false,
                            showCart = false,
                        }) {
     const navigate = useNavigate();
+    const {user, role, logout} = useAuth();
 
     const handleLogout = () => {
-        localStorage.removeItem("user");
+        logout();
         navigate("/login");
     };
 
@@ -52,11 +53,6 @@ export function Header({
                 )}
 
                 <div className="user-section">
-                    <div className="notification">
-                        <Bell size={20} />
-                        <span className="notification-badge">3</span>
-                    </div>
-
                     {showCart && (
                         <div className="cart" onClick={() => navigate("/cart")}>
                             <ShoppingCart size={20} />
@@ -64,14 +60,27 @@ export function Header({
                         </div>
                     )}
 
-                    <div className="user-info">
-                        <div className="user-name">John Doe</div>
-                        <div className="text-muted small">john@example.com</div>
-                    </div>
+                    {user ? (
+                        <>
+                            <div className="notification">
+                                <Bell size={20} />
+                                <span className="notification-badge">3</span>
+                            </div>
 
-                    <Button className="btn-danger" onClick={handleLogout}>
-                        Log out
-                    </Button>
+                            <div className="user-info">
+                                <div className="user-name">{user ? user.fullname || user.username : ""}</div>
+                                <div className="text-muted small">{user ? user.email : ""}</div>
+                            </div>
+
+                            <Button className="btn-danger" onClick={handleLogout}>
+                                Log out
+                            </Button>
+                        </>
+                    ) : (
+                        <Button className="btn-primary" onClick={() => navigate("/login")}>
+                            Log in
+                        </Button>
+                    )}
                 </div>
             </div>
         </header>

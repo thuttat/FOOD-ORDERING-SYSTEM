@@ -1,9 +1,13 @@
 import {Button} from "../../components/common/Button.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
+import {useAuth} from "../../services/AuthContext.jsx";
+import axiosClient from "../../apis/AxiosClient.js";
+import {ChevronLeftIcon} from "lucide-react";
 
 export function Login() {
+    const {login} = useAuth();
+
     const [formData, setFormData] = useState({
         usernameOrEmail: "",
         password: "",
@@ -26,27 +30,28 @@ export function Login() {
                 password: formData.password.trim(),
             };
 
-
-            const response = await axios.post("http://localhost:8080/api/auth/login", payloadToSend);
+            const response = await axiosClient.post("/auth/login", payloadToSend);
 
             if (response.status === 200) {
-                localStorage.setItem("token", response.data.accessToken);
-                const userRole = response.data.user.role;
-                localStorage.setItem("role", userRole);
+                const data = response.data;
+                const userRole = data.user.role;
 
-                switch (userRole) {
-                    case "ADMIN":
-                        navigate("/admin");
-                        break;
-                    case "RESTAURANT":
-                        navigate("/restaurant");
-                        break;
-                    case "USER":
-                        navigate("/");
-                        break;
-                    default:
-                        navigate("/");
-                        break;
+                if (data.accessToken && userRole) {
+                    await login(data.accessToken, userRole);
+                    switch (userRole) {
+                        case "ADMIN":
+                            navigate("/admin/dashboard");
+                            break;
+                        case "RESTAURANT":
+                            navigate("/restaurant/dashboard");
+                            break;
+                        case "USER":
+                            navigate("/");
+                            break;
+                        default:
+                            navigate("/");
+                            break;
+                    }
                 }
             }
         } catch (error) {
@@ -60,6 +65,11 @@ export function Login() {
             <div className="login-container">
                 <div className="card login-card">
                     <div className="login-header">
+                        <div className="back-btn" onClick={() => navigate("/")}>
+                            <ChevronLeftIcon className="action-icon" />
+                            <span>Back</span>
+                        </div>
+
                         <div className="login-icon">
                             🔐
                         </div>

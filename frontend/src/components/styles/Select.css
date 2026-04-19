@@ -1,0 +1,32 @@
+.select-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.select-label {
+    font-size: 14px;
+    color: var(--foreground);
+}
+
+.select {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--muted);
+    color: var(--foreground);
+    outline: none;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 14px;
+}
+
+.select:focus {
+    border-color: var(--primary);
+}
+
+.select:hover {
+    border-color: var(--primary);
+}

@@ -4,7 +4,7 @@
     --card: #FFFFFF;
     --primary: #F97316;
     --secondary: #FEF3C7;
-    --muted: #F1F5F9;
+    --muted: #f5f5f5;
     --border: rgba(0, 0, 0, 0.08);
 
     --pastel-blue: #FFE0CC;
@@ -19,4 +19,9 @@
     --bs-border-color: rgba(0, 0, 0, 0.08);
     --bs-body-bg: #FFF7ED;
     --bs-body-color: #1E293B;
+
+    --destructive: #ef4444;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --muted-foreground: #6b7280;
 }

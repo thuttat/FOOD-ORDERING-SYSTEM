@@ -85,4 +85,19 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.findByStatus(RestaurantStatus.PENDING, pageable)
                 .map(r -> restaurantMapper.toResponse(r, 0.0));
     }
+
+    @Transactional
+    @Override
+    public RestaurantResponse reinstateRestaurant(Long id) {
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found!"));
+
+        if (restaurant.getStatus() != RestaurantStatus.LOCKED) {
+            throw new RuntimeException("Only LOCKED restaurants can be reinstated!");
+        }
+
+        restaurant.setStatus(RestaurantStatus.ACTIVE);
+        Restaurant saved = restaurantRepository.save(restaurant);
+        return restaurantMapper.toResponse(saved);
+    }
 }
