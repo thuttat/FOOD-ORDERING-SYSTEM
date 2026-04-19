@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axiosClient from "../../api/AxiosClient";
-import { Card, CardContent } from "../../components/common/Card.jsx";
-import { Button } from "../../components/common/Button.jsx";
+import axiosClient from "../../../apis/AxiosClient.js";
+import { Card, CardContent } from "../../../components/common/Card.jsx";
+import { Button } from "../../../components/common/Button.jsx";
 import "./Home.css";
 
 export function Home() {

@@ -2,27 +2,25 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./services/AuthContext.jsx";
 import PrivateRoute from "./pages/auth/PrivateRoute.jsx";
 
-// Auth Pages
 import { Login } from "./pages/auth/Login.jsx";
 import { Register } from "./pages/auth/Register.jsx";
 
-// Layouts
 import { AdminLayout } from "./layouts/AdminLayout.jsx";
 import { CustomerLayout } from "./layouts/CustomerLayout.jsx";
 import { RestaurantLayout } from "./layouts/RestaurantLayout.jsx";
 
-// Customer Pages
 import { Home } from "./pages/customer/Home/Home.jsx";
+import { RestaurantDetail } from "./pages/customer/RestaurantDetails/RestaurantDetail.jsx";
+import { Cart } from "./pages/customer/Cart/Cart.jsx";
+import { PaymentResult } from "./pages/customer/PaymentResult/PaymentResult.jsx";
 
-// Admin Pages (Theo cấu trúc Folder-per-page)
 import { AdminDashboard } from "./pages/admin/AdminDashboard/AdminDashboard.jsx";
 import { RestaurantsManagement } from "./pages/admin/RestaurantsManagement/RestaurantsManagement.jsx";
 import { ReviewsManagement } from "./pages/admin/ReviewsManagement/ReviewsManagement.jsx";
 
-// Restaurant Pages (Tích hợp chức năng mới)
-import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants/DashboardRestaurants.jsx"; 
-import RealtimeOrder from "./pages/restaurant/Orders/RealtimeOrder.jsx";
-import MenuTable from "./pages/restaurant/Menu/MenuTable.jsx";
+import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants.jsx"; 
+import MenuTable from "./pages/restaurant/components/MenuTable.jsx";
+import RealtimeOrder from "./pages/restaurant/components/RealtimeOrder.jsx";
 
 function App() {
     return (
@@ -32,11 +30,19 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
 
-
-                    <Route element={<CustomerLayout />}>
+                    <Route
+                        element={
+                            <PrivateRoute allowedRoles={["USER"]}>
+                                <CustomerLayout />
+                            </PrivateRoute>
+                        }
+                    >
                         <Route path="/" element={<Home />} />
-   
+                        <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+                        <Route path="/cart" element={<Cart />} />
+                        <Route path="/payment-result" element={<PaymentResult />} />
                     </Route>
+
                     <Route
                         path="/restaurant/*"
                         element={
@@ -47,9 +53,11 @@ function App() {
                     >
                         <Route index element={<Navigate to="dashboard" replace />} />
                         <Route path="dashboard" element={<DashboardRestaurants />} />
-                        <Route path="orders" element={<RealtimeOrder />} />
                         <Route path="menu" element={<MenuTable />} />
+                        <Route path="orders" element={<RealtimeOrder />} />
                     </Route>
+
+    
                     <Route
                         path="/admin/*"
                         element={
