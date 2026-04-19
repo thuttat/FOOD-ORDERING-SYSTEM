@@ -14,7 +14,7 @@ Tuần này nhóm tập trung vào việc giải quyết xung đột mã nguồn
 | Thành viên | MSSV | Công việc | Trạng thái |
 |------------|------|-----------|------------|
 | **Trịnh Thị Anh Thư** | 2351010205 | Hoàn thiện UI/Logic trang RestaurantDetail và Cart . Xử lý triệt để lỗi Infinite Redirect Loop trong `AxiosClient` và `PrivateRoute`. Hoàn thiện thanh toán. | [e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/57f8d95ee31b380c0e3e6745bb6da4114eabb7a2) |
-| **Lê Hoàng Bảo Trân** | 2351010214 | Hoàn thiện UI Dashboard Admin (biểu đồ doanh thu). Ghép nối API duyệt nhà hàng. | [e]() |
+| **Lê Hoàng Bảo Trân** | 2351010214 | Hoàn thiện UI Dashboard Admin (biểu đồ doanh thu). Ghép nối API duyệt nhà hàng. | [e](https://github.com/thuttat/FOOD-ORDERING-SYSTEM/commit/c2573029278e06512f2d357871476c70a0030574) |
 | **Nguyễn Triệu Duy** | 2351010036 | Hoàn thiện UI Quản lý Menu. Xử lý hiển thị thông báo Real-time cho Nhà hàng khi có đơn mới. | [e] | 
 
 ---
