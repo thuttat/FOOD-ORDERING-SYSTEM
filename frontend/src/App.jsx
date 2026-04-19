@@ -6,7 +6,7 @@ import { AdminLayout } from "./layouts/AdminLayout.jsx";
 import { AdminRestaurants } from "./pages/admin/AdminRestaurants.jsx";
 import PrivateRoute from "./pages/auth/PrivateRoute.jsx";
 import { CustomerLayout } from "./layouts/CustomerLayout.jsx";
-import { Home } from "./pages/customer/Home.jsx";
+// import { Home } from "./pages/customer/Home/Home.jsx";
 
 import  {RestaurantLayout}  from "./layouts/RestaurantLayout.jsx";
 import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants.jsx"; 
@@ -26,7 +26,7 @@ return (
                     </PrivateRoute>
                 }
             >
-                <Route index element={<Home />} />
+                {/* <Route index element={<Home />} /> */}
             </Route>
 
             <Route

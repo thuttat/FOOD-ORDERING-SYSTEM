@@ -10,6 +10,23 @@ export default function MenuTable() {
     { name: 'Design Apuurion', price: '175.000đ', status: 'Sold Out', highlight: false }
   ];
 
+  const handleDelete = (item) => {
+    if (window.confirm(`Duy có chắc muốn xóa món "${item.name}" không?`)) {
+      
+      const newItems = items.filter(i => i.id !== item.id);
+      setItems(newItems);
+      console.log("Đã xóa món:", item.name);
+      //
+    }
+  };
+
+  const handleEdit = (item) => {
+    console.log("Đang sửa món:", item);
+    alert(`Form sửa cho món: ${item.name}`);
+    // 
+  };
+
+
   return (
     <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 overflow-hidden">
       <table className="w-full">

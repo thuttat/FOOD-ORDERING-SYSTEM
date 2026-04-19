@@ -1,6 +1,6 @@
 app:
   jwt:
-    secret: "iw3uetgdrouq36ye8723teuwdakfy"
+    secret: "iw3uetgdrouq36ye8723teuwdakfyaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     access-token-expires-ms: 3600000 
     refresh-token-expires-ms: 604800000 
   payment:
