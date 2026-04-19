@@ -35,7 +35,6 @@ public class RestaurantMapper {
             restaurant.getName(),
             restaurant.getPhoneNumber(),
             restaurant.getAddress(),
-            restaurant.getPhoneNumber(), 
             restaurant.getDescription(),
             restaurant.getImageUrl(),
             restaurant.getIsOpen(),

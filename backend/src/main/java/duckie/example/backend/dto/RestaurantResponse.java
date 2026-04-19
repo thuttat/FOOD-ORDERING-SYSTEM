@@ -11,7 +11,6 @@ public record RestaurantResponse(
     String name,
     String phoneNumber,
     String address,
-    String phoneNumber, 
     String description,
     String imageUrl,
     Boolean isOpen,

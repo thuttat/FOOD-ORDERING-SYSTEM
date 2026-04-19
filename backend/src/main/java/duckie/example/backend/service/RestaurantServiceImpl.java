@@ -15,6 +15,7 @@ import duckie.example.backend.dto.RestaurantResponse;
 import duckie.example.backend.entity.Restaurant;
 import duckie.example.backend.entity.RestaurantStatus;
 import duckie.example.backend.entity.User;
+import duckie.example.backend.exception.ResourceNotFoundException;
 import duckie.example.backend.mapper.RestaurantMapper;
 import duckie.example.backend.repository.RestaurantRepository;
 import duckie.example.backend.repository.UserRepository;
@@ -89,8 +90,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     @Transactional
     @Override
     public RestaurantResponse reinstateRestaurant(Long id) {
-        Restaurant restaurant = restaurantRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found!"));
+        Restaurant restaurant = restaurantRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Restaurant not found!"));
 
         if (restaurant.getStatus() != RestaurantStatus.LOCKED) {
             throw new RuntimeException("Only LOCKED restaurants can be reinstated!");
@@ -98,6 +98,6 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         restaurant.setStatus(RestaurantStatus.ACTIVE);
         Restaurant saved = restaurantRepository.save(restaurant);
-        return restaurantMapper.toResponse(saved);
+        return restaurantMapper.toResponse(saved, 0.0);
     }
 }
