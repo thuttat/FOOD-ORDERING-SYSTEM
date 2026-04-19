@@ -53,9 +53,9 @@ body {
 
 .filter-bar {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .filter-buttons {

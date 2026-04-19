@@ -10,6 +10,8 @@ import {Home} from "./pages/customer/Home.jsx";
 import {RestaurantLayout} from "./layouts/RestaurantLayout.jsx";
 import {ReviewsManagement} from "./pages/admin/ReviewsManagement/ReviewsManagement.jsx";
 import {AuthProvider} from "./services/AuthContext.jsx";
+import {UsersManagement} from "./pages/admin/UsersManagement/UsersManagement.jsx";
+import {AdminOrders} from "./pages/admin/AdminOrders/AdminOrders.jsx";
 
 function App() {
   return (
@@ -50,6 +52,8 @@ function App() {
                       <Route path="dashboard" element={<AdminDashboard />} />
                       <Route path="restaurants" element={<RestaurantsManagement />} />
                       <Route path="reviews" element={<ReviewsManagement />} />
+                      <Route path="users" element={<UsersManagement />} />
+                      <Route path="orders" element={<AdminOrders />} />
                   </Route>
               </Routes>
           </BrowserRouter>

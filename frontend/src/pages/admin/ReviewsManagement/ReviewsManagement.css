@@ -37,12 +37,6 @@
     color: var(--foreground);
 }
 
-.filter-bar {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
 .table {
     width: 100%;
     border-collapse: collapse;
