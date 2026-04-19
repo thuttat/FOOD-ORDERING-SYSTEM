@@ -10,10 +10,9 @@ public record UserResponse(
     String fullname,
     String username,
     String email,
+    String phone, 
     Role role,
     UserStatus status,
     Instant createdAt,
     Instant updatedAt
-){
-
-}
+){}

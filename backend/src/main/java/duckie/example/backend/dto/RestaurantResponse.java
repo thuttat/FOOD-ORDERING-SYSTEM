@@ -10,11 +10,12 @@ public record RestaurantResponse(
     String ownerName,
     String name,
     String address,
+    String phoneNumber, 
     String description,
     String imageUrl,
     Boolean isOpen,
     RestaurantStatus status,
+    Double rating, 
     Instant createdAt,
     Instant updatedAt
-) {
-}
+) {}

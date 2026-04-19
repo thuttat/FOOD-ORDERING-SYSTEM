@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers("/api/payments/vnpay-callback", "/api/payments/momo-callback").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions

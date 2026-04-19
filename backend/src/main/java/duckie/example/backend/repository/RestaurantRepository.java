@@ -12,8 +12,7 @@ import duckie.example.backend.entity.RestaurantStatus;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-    List<Restaurant> findByIsOpenTrue();
-
+    List<Restaurant> findByIsOpenTrueAndStatus(RestaurantStatus status);
+    List<Restaurant> findByOwnerId(Long ownerId); // Bổ sung cho chủ quán quản lý
     Page<Restaurant> findByStatus(RestaurantStatus status, Pageable pageable);
-
 }

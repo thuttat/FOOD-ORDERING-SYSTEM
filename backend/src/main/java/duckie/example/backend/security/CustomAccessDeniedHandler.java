@@ -18,7 +18,6 @@ import tools.jackson.databind.ObjectMapper;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
-
     private static final Logger log = LoggerFactory.getLogger(CustomAccessDeniedHandler.class);
     private final ObjectMapper objectMapper;
 
@@ -27,25 +26,20 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     @Override
-    public void handle(HttpServletRequest request,
-            HttpServletResponse response, 
-            AccessDeniedException authException)throws IOException,ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, 
+                       AccessDeniedException authException) throws IOException, ServletException {
         log.debug("Forbidden:{} {}", request.getRequestURI(), authException.getMessage());
-
-        response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
         ApiError body = new ApiError(
             "Forbidden",
-            "You do not have permission to access this resource.",
+            "You're not this role.",
             null,
             request.getRequestURI(),
             Instant.now()
         );
         objectMapper.writeValue(response.getOutputStream(), body);
-
     }
-    
-    
 }
