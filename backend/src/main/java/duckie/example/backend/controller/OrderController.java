@@ -21,13 +21,11 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    // Lấy User hiện tại đang đăng nhập bằng @AuthenticationPrincipal
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
             @Valid @RequestBody OrderRequest request, 
             @AuthenticationPrincipal User currentUser) {
-        
-        // Gọi đúng tên phương thức createOrder trong Service
+
         OrderResponse response = orderService.createOrder(currentUser, request);
         return ResponseEntity.ok(response);
     }
