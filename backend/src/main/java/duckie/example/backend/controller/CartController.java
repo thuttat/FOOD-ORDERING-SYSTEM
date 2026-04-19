@@ -1,7 +1,7 @@
 package duckie.example.backend.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,30 +26,23 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    private User getMockUser() {
-        return User.builder().id(1L).build(); 
-    }
-
     @GetMapping
-    public ResponseEntity<CartResponse> getCart() {
-        return ResponseEntity.ok(cartService.getCart(getMockUser()));
+    public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(cartService.getCart(currentUser));
     }
 
     @PostMapping("/items")
-    public ResponseEntity<CartResponse> addItem(@Valid @RequestBody CartItemRequest request) {
-        return ResponseEntity.ok(cartService.addItemToCart(getMockUser(), request));
+    public ResponseEntity<CartResponse> addItem(
+            @Valid @RequestBody CartItemRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(cartService.addItemToCart(currentUser, request));
     }
 
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> updateItemQuantity(
             @PathVariable Long cartItemId, 
-            @RequestParam Integer quantity) {
-        return ResponseEntity.ok(cartService.updateCartItem(getMockUser(), cartItemId, quantity));
-    }
-
-    @DeleteMapping("/items/{cartItemId}")
-    public ResponseEntity<Void> removeItem(@PathVariable Long cartItemId) {
-        cartService.removeCartItem(cartItemId);
-        return ResponseEntity.noContent().build();
+            @RequestParam Integer quantity,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(cartService.updateCartItem(currentUser, cartItemId, quantity));
     }
 }

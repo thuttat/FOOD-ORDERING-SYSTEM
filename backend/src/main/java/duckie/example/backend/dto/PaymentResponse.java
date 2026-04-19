@@ -10,5 +10,6 @@ public record PaymentResponse(
     String method,
     BigDecimal amount,
     String status,
+    String paymentUrl, 
     Instant createdAt
 ) {}

@@ -1,17 +1,9 @@
 package duckie.example.backend.controller;
 
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import duckie.example.backend.dto.OrderRequest;
 import duckie.example.backend.dto.OrderResponse;
 import duckie.example.backend.entity.OrderStatus;
@@ -29,17 +21,14 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<OrderResponse>> findAllOrders() {
-        List<OrderResponse> orders = orderService.findAll();
-        return ResponseEntity.ok(orders);
-    }
-
+    // Lấy User hiện tại đang đăng nhập bằng @AuthenticationPrincipal
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest request) {
-        User customer = User.builder().id(1L).build(); 
+    public ResponseEntity<OrderResponse> createOrder(
+            @Valid @RequestBody OrderRequest request, 
+            @AuthenticationPrincipal User currentUser) {
         
-        OrderResponse response = orderService.create(request, customer);
+        // Gọi đúng tên phương thức createOrder trong Service
+        OrderResponse response = orderService.createOrder(currentUser, request);
         return ResponseEntity.ok(response);
     }
 

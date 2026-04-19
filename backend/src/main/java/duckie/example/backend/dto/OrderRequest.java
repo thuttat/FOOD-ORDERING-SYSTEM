@@ -1,5 +1,6 @@
 package duckie.example.backend.dto;
 
+import duckie.example.backend.entity.PaymentMethod;
 import jakarta.validation.constraints.NotBlank;
 
 
@@ -10,5 +11,5 @@ public record OrderRequest(
     String customerNote,
 
     @NotBlank(message = "Phương thức thanh toán không được để trống")
-    String paymentMethod 
+    PaymentMethod paymentMethod 
 ) {}

@@ -20,6 +20,7 @@ import duckie.example.backend.entity.Order;
 import duckie.example.backend.entity.OrderItem;
 import duckie.example.backend.entity.OrderStatus;
 import duckie.example.backend.entity.Payment;
+import duckie.example.backend.entity.PaymentMethod;
 import duckie.example.backend.entity.Restaurant;
 import duckie.example.backend.entity.User;
 import duckie.example.backend.mapper.OrderItemMapper;
@@ -32,7 +33,6 @@ import duckie.example.backend.repository.PaymentRepository;
 
 @Service
 public class OrderService {
-
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
@@ -44,14 +44,10 @@ public class OrderService {
     private final PaymentMapper paymentMapper;
     private final RabbitTemplate rabbitTemplate;
 
-    public OrderService(OrderRepository orderRepository, 
-                        CartRepository cartRepository,
-                        CartItemRepository cartItemRepository,
-                        PaymentRepository paymentRepository,
-                        OrderMapper orderMapper,
-                        OrderItemMapper orderItemMapper,
-                        PaymentMapper paymentMapper,
-                        RabbitTemplate rabbitTemplate) {
+    public OrderService(OrderRepository orderRepository, CartRepository cartRepository,
+                        CartItemRepository cartItemRepository, PaymentRepository paymentRepository,
+                        OrderMapper orderMapper, OrderItemMapper orderItemMapper,
+                        PaymentMapper paymentMapper, RabbitTemplate rabbitTemplate) {
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
@@ -62,64 +58,55 @@ public class OrderService {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    @Transactional(readOnly = true)
-    public List<OrderResponse> findAll() {
-        return orderRepository.findAll().stream()
-                .map(orderMapper::toResponse)
-                .collect(Collectors.toList());
-    }
-
     @Transactional
-    public OrderResponse create(OrderRequest request, User customer) {
+    public OrderResponse createOrder(User customer, OrderRequest request) {
         Cart cart = cartRepository.findByCustomerId(customer.getId())
-                .orElseThrow(() -> new RuntimeException("Giỏ hàng trống!"));
-        
+                .orElseThrow(() -> new RuntimeException("Cart does not exist"));
+
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
-        if (cartItems.isEmpty()) {
-            throw new RuntimeException("Không có món ăn nào trong giỏ để đặt hàng!");
-        }
- 
+        if (cartItems.isEmpty()) throw new RuntimeException("Cart is blank");
+
         Restaurant restaurant = cartItems.get(0).getMenuItem().getCategory().getRestaurant();
 
         Order order = orderMapper.toEntity(request, customer, restaurant);
-        BigDecimal subTotal = BigDecimal.ZERO;
 
-        for (CartItem cItem : cartItems) {
-            OrderItem orderItem = orderItemMapper.fromCartItem(cItem, order);
-            order.getItems().add(orderItem);
-            
-            BigDecimal itemTotal = orderItem.getUnitPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity()));
-            subTotal = subTotal.add(itemTotal);
-        }
+        List<OrderItem> orderItems = cartItems.stream()
+                .map(ci -> orderItemMapper.fromCartItem(ci, order))
+                .collect(Collectors.toList());
+        order.setItems(orderItems);
 
-        order.setTotalAmount(subTotal.add(order.getDeliveryFee()));
-        order = orderRepository.save(order);
-        logger.info("Created new order with id: {}", order.getId());
+        BigDecimal total = orderItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .add(order.getDeliveryFee());
+        order.setTotalAmount(total);
 
+        Order savedOrder = orderRepository.save(order);
+
+        PaymentMethod method = request.paymentMethod(); 
+        
         Payment payment = paymentMapper.toEntity(
-            new PaymentRequest(order.getId(), request.paymentMethod(), order.getTotalAmount()), 
-            order, 
+            new PaymentRequest(savedOrder.getId(), method, savedOrder.getTotalAmount()), 
+            savedOrder, 
             "TXN_" + System.currentTimeMillis()
         );
         paymentRepository.save(payment);
-
         cartItemRepository.deleteByCartId(cart.getId());
         
-        String msg = "New order created: #" + order.getId();
-        sendNotification(msg);
+        sendNotification("Bill created: #" + savedOrder.getId());
         
-        return orderMapper.toResponse(order);
+        return orderMapper.toResponse(savedOrder);
     }
 
     @Transactional
     public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+                .orElseThrow(() -> new RuntimeException("cannot find bill ID: " + orderId));
 
         order.setStatus(newStatus);
         Order savedOrder = orderRepository.save(order);
         
-        String message = String.format("Order #%d status updated to: %s", savedOrder.getId(), newStatus.name());
+        String message = String.format("Bill #%d changed status into : %s", savedOrder.getId(), newStatus.name());
         sendNotification(message);
         
         return orderMapper.toResponse(savedOrder);
@@ -132,9 +119,9 @@ public class OrderService {
                 RabbitMQConfig.ROUTING_KEY_ORDER, 
                 message
             );
-            logger.info("Notification sent to RabbitMQ: {}", message);
+            logger.info("RabbitMQ Notification Success: {}", message);
         } catch (Exception e) {
-            logger.error("Failed to send RabbitMQ notification: {}", e.getMessage());
+            logger.error("RabbitMQ Notification Failed: {}", e.getMessage());
         }
     }
 }

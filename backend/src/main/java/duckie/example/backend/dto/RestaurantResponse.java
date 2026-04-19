@@ -10,6 +10,7 @@ public record RestaurantResponse(
     String ownerName,
     String name,
     String address,
+    String phoneNumber, 
     String description,
     String imageUrl,
     Boolean isOpen,
@@ -18,4 +19,3 @@ public record RestaurantResponse(
     Instant createdAt,
     Instant updatedAt
 ) {}
-

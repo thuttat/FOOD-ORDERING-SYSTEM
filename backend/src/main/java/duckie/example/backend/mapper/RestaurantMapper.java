@@ -16,7 +16,7 @@ public class RestaurantMapper {
         return Restaurant.builder()
                 .name(request.name())
                 .address(request.address())
-                .phoneNumber(request.phoneNumber()) 
+                .phoneNumber(request.phoneNumber())
                 .description(request.description())
                 .imageUrl(request.imageUrl())      
                 .isOpen(request.isOpen() != null ? request.isOpen() : true)
@@ -34,6 +34,7 @@ public class RestaurantMapper {
             restaurant.getOwner().getFullname(), 
             restaurant.getName(),
             restaurant.getAddress(),
+            restaurant.getPhoneNumber(), 
             restaurant.getDescription(),
             restaurant.getImageUrl(),
             restaurant.getIsOpen(),
