@@ -20,6 +20,7 @@ import duckie.example.backend.entity.User;
 import duckie.example.backend.entity.UserStatus;
 import duckie.example.backend.exception.DuplicateResourceException;
 import duckie.example.backend.exception.ResourceNotFoundException;
+import duckie.example.backend.mapper.UserMapper;
 import duckie.example.backend.repository.UserRepository;
 import duckie.example.backend.security.JwtService;
 import jakarta.transaction.Transactional;
@@ -63,11 +64,13 @@ public class AuthService {
         if(userRepository.existsByEmail(request.email())){
             throw new DuplicateResourceException("Email da ton tai!");
         }
+        Role finalRole = (request.role() == Role.RESTAURANT) ? Role.RESTAURANT : Role.USER;
+
         User user=User.builder().username(request.username())
             .email(request.email())
             .fullname(request.fullname())           
             .password(passwordEncoder.encode(request.password()))
-            .role(request.role() != null ? request.role() : Role.USER)
+            .role(finalRole)
             .status(UserStatus.ACTIVE)
             .build();
         user=userRepository.save(user);

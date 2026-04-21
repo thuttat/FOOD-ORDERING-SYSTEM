@@ -6,20 +6,22 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
 public record UserPatchRequest(
-    @Size(min = 3, max = 50, message = "Username phải từ 3 đến 50 ký tự")
+    @Size(min = 3, max = 100, message = "Fullname must be between 3 and 100 characters")
+    String fullname,
+
+    String phone, 
+
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     String username,
 
-    @Email(message = "Email không hợp lệ")
+    @Email(message = "Invalid email")
     String email,
     
-    @Size(min = 6, max = 100,message = "Password must be between 6 and 100 characters")
+    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
     String password,
 
     @Deprecated
     Role role,
     @Deprecated
     UserStatus status
-
-
 ) {}
-

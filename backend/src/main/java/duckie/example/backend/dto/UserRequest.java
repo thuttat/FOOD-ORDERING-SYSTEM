@@ -18,13 +18,13 @@ public record UserRequest (
         @Email(message = "Email is invalid")
         String email,
 
-        @NotBlank(message = "Password can not be blank")
-        @Size(min = 6, max = 100,message = "Password must be between 6 and 100 characters")
-        String password,
+        @NotBlank(message = "Phone number is required")
+        String phone, 
 
+        @NotBlank(message = "Password can not be blank")
+        @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
+        String password,
 
         @Deprecated
         Role role
-        // @Deprecated
-        // Status status
 ){}

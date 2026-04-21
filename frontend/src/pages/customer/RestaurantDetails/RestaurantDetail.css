@@ -1,0 +1,30 @@
+.restaurant-detail {
+    padding-bottom: 50px;
+}
+
+.res-banner {
+    background: linear-gradient(to bottom, var(--pastel-blue), var(--card));
+    padding: 40px 24px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    border: 1px solid var(--border);
+}
+
+.res-info h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.5rem;
+    color: var(--foreground);
+}
+
+.res-meta {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}

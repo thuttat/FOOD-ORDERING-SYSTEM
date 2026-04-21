@@ -1,0 +1,38 @@
+.result-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    text-align: center;
+}
+
+.status-box {
+    background: var(--card);
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+    max-width: 400px;
+    width: 100%;
+}
+
+.status-box.success .icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.status-box.fail .icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.status-box h2 {
+    margin-bottom: 12px;
+    color: var(--foreground);
+}
+
+.status-box p {
+    color: var(--muted-foreground);
+    margin-bottom: 0;
+}
