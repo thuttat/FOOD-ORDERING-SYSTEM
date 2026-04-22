@@ -1,70 +1,112 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { Users, Store, ShoppingBag, DollarSign } from "lucide-react";
 import { StatsCard } from "../../../components/common/StatsCard.jsx";
 import { RevenueChart } from "./components/RevenueChart.jsx";
 import { OrdersPieChart } from "./components/OrdersPieChart.jsx";
 import {TopRestaurantsTable} from "./components/TopRestaurantsTable.jsx";
 import "./AdminDashboard.css"
+import AdminDashboardService from "../../../apis/AdminDashboardService.js";
 
-
-const ordersByStatus = [
-    { name: "Completed", value: 45, color: "#10b981" },
-    { name: "Preparing", value: 20, color: "#ff6b35" },
-    { name: "Pending", value: 15, color: "#f59e0b" },
-    { name: "Cancelled", value: 5, color: "#ef4444" },
-];
-
-const revenueData = [
-    { month: "Jan", revenue: 15000 },
-    { month: "Feb", revenue: 18000 },
-    { month: "Mar", revenue: 22000 },
-    { month: "Apr", revenue: 25000 },
-];
-
-const topRestaurants = [
-    { name: "Burger Palace", orders: 234, revenue: 5678, rating: 4.5, status: "active" },
-    { name: "Sushi Haven", orders: 189, revenue: 4321, rating: 4.8, status: "active" },
-    { name: "Pizza Corner", orders: 156, revenue: 3456, rating: 4.3, status: "active" },
-    { name: "Thai Delight", orders: 123, revenue: 2890, rating: 4.6, status: "active" },
-];
 
 export function AdminDashboard() {
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setLoading(true);
+                const response = await AdminDashboardService.getDashboardStats();
+                const data = response.data ? response.data : response;
+                setStats(data);
+            } catch (error) {
+                console.error("Error fetching dashboard stats: ", error);
+                setError("Failed to load dashboard stats. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="container">
+                <div className="admin-dashboard">
+                    <h1>Loading...</h1>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container">
+                <div className="admin-dashboard">
+                    <h1 style={{ color: "var(--danger-color)" }}>Error</h1>
+                    <p>{error}</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!stats) return null;
+
+    const statusColors = {
+        "DELIVERED": "#10b981",
+        "PENDING": "#f59e0b",
+        "PREPARING": "#ff6b35",
+        "CANCELLED": "#ef4444"
+    };
+
+    const formattedRevenueData = stats.monthlyRevenueChart.map(item => ({
+        month: item.label,
+        revenue: item.value
+    }));
+
+    const formattedOrderData = stats.orderStatusChart.map(item => ({
+        name: item.status,
+        value: item.count,
+        color: statusColors[item.status] || "#9ca3af"
+    }));
+
     return (
         <div className="container">
             <div className="admin-dashboard">
                 <h1>Admin Dashboard</h1>
                 <div className="stats-grid">
                     <StatsCard
-                        title="Total Users"
-                        value="1,234"
+                        title="Total Active Users"
+                        value={stats.totalActiveUsers.toLocaleString()}
                         icon={<Users />}
                         iconClass="primary"
-                        subtext="+156 this month"
+                        subtext="Across the system"
                         subtextClass="success"
                     />
 
                     <StatsCard
-                        title="Restaurants"
-                        value="89"
-                        subtext="+12 this month"
+                        title="Active Restaurants"
+                        value={stats.totalActiveRestaurants.toLocaleString()}
+                        subtext="Verified partners"
                         icon={<Store />}
                         iconClass="primary"
                         subtextClass="success"
                     />
 
                     <StatsCard
-                        title="Total Orders"
-                        value="5,678"
-                        subtext="+432 this week"
+                        title="Orders This Month"
+                        value={stats.totalOrdersThisMonth.toLocaleString()}
+                        subtext="Completed & Processing"
                         icon={<ShoppingBag />}
                         iconClass="primary"
                         subtextClass="success"
                     />
 
                     <StatsCard
-                        title="Revenue"
-                        value="$125.4K"
-                        subtext="+18% this month"
+                        title="Monthly Revenue"
+                        value={`${stats.revenueThisMonth.toLocaleString()}₫`}
+                        subtext="Gross volume"
                         icon={<DollarSign />}
                         iconClass="success"
                         subtextClass="success"
@@ -72,11 +114,11 @@ export function AdminDashboard() {
                 </div>
 
                 <div className="chart-grid">
-                    <RevenueChart data={revenueData} />
-                    <OrdersPieChart data={ordersByStatus} />
+                    <RevenueChart data={formattedRevenueData} />
+                    <OrdersPieChart data={formattedOrderData} />
                 </div>
 
-                <TopRestaurantsTable data={topRestaurants} />
+                <TopRestaurantsTable data={stats.topRestaurants} />
             </div>
         </div>
     );

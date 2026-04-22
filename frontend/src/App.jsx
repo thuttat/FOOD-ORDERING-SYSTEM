@@ -21,6 +21,8 @@ import { ReviewsManagement } from "./pages/admin/ReviewsManagement/ReviewsManage
 import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants.jsx"; 
 import MenuTable from "./pages/restaurant/components/MenuTable.jsx";
 import RealtimeOrder from "./pages/restaurant/components/RealtimeOrder.jsx";
+import {UsersManagement} from "./pages/admin/UsersManagement/UsersManagement.jsx";
+import {AdminOrders} from "./pages/admin/AdminOrders/AdminOrders.jsx";
 
 function App() {
     return (
@@ -70,6 +72,8 @@ function App() {
                         <Route path="dashboard" element={<AdminDashboard />} />
                         <Route path="restaurants" element={<RestaurantsManagement />} />
                         <Route path="reviews" element={<ReviewsManagement />} />
+                        <Route path="users" element={<UsersManagement />} />
+                        <Route path="orders" element={<AdminOrders />} />
                     </Route>
 
                     <Route path="*" element={<Navigate to="/" replace />} />

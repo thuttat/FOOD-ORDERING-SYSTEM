@@ -12,7 +12,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminDashboardServiceImpl implements AdminDashboardService {
@@ -24,18 +28,21 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         long totalUsers = userRepository.count();
         long totalRestaurants = restaurantRepository.count();
         BigDecimal revenue = orderRepository.calculateRevenueThisMonth();
+        List<Object[]> rawData = orderRepository.getRawMonthlyRevenueData();
+
+        List<ChartData> revenueChart = rawData.stream().map(row -> {
+            int monthIndex = Integer.parseInt(row[0].toString());
+            String monthLabel = Month.of(monthIndex).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+            BigDecimal amount = new BigDecimal(row[1].toString());
+
+            return new ChartData(monthLabel, amount);
+        }).collect(Collectors.toList());
+
         List<StatusChartData> statusChartData = orderRepository.countOrderByStatusThisMonth();
         List<TopRestaurantResponse> top5Restaurants = orderRepository.findTop5Restaurants(PageRequest.of(0, 5));
+        long totalOrdersThisMonth = orderRepository.count();
 
-        List<ChartData> revenueChart = List.of(
-                new ChartData("Tháng 12", new BigDecimal("5000000")),
-                new ChartData("Tháng 1", new BigDecimal("7500000")),
-                new ChartData("Tháng 2", new BigDecimal("6200000")),
-                new ChartData("Tháng 3", new BigDecimal("9800000")),
-                new ChartData("Tháng 4", revenue != null ? revenue : BigDecimal.ZERO)
-        );
-
-        return new DashboardStatsResponse(totalUsers, totalRestaurants, 150L,
-                revenue, revenueChart, statusChartData, top5Restaurants);
+        return new DashboardStatsResponse(totalUsers, totalRestaurants, totalOrdersThisMonth,
+                revenue != null ? revenue : BigDecimal.ZERO, revenueChart, statusChartData, top5Restaurants);
     }
 }

@@ -13,13 +13,6 @@ import { RejectModal } from './components/RejectModal.jsx';
 import { ApprovalChart } from './components/ApprovalChart.jsx';
 import {StatsSection} from "./components/StatsSection.jsx";
 
-const analyticsData = [
-    { month: 'Jan', approved: 8, rejected: 2 },
-    { month: 'Feb', approved: 12, rejected: 1 },
-    { month: 'Mar', approved: 10, rejected: 3 },
-    { month: 'Apr', approved: 5, rejected: 1 },
-];
-
 export function RestaurantsManagement() {
     const [activeTab, setActiveTab] = useState('active');
     const [searchQuery, setSearchQuery] = useState('');
@@ -63,6 +56,34 @@ export function RestaurantsManagement() {
     const activeRestaurants = filteredRestaurants.filter(r => r.status === "ACTIVE");
     const pendingRestaurants = filteredRestaurants.filter(r => r.status === "PENDING");
     const lockedRestaurants = filteredRestaurants.filter(r => r.status === "LOCKED");
+
+    const totalProcessed = activeRestaurants.length + lockedRestaurants.length;
+    const approvalRate = totalProcessed === 0 ? 0 : Math.round((activeRestaurants.length / totalProcessed) * 100);
+
+    const getChartData = () => {
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const dataMap = {};
+        const today = new Date();
+
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            const monthStr = monthNames[d.getMonth()];
+            dataMap[monthStr] = { month: monthStr, approved: 0, rejected: 0 };
+        }
+
+        restaurants.forEach(r => {
+            if (!r.createdAt) return;
+            const d = new Date(r.createdAt);
+            const monthStr = monthNames[d.getMonth()];
+
+            if (dataMap[monthStr]) {
+                if (r.status === "ACTIVE") dataMap[monthStr].approved += 1;
+                if (r.status === "LOCKED") dataMap[monthStr].rejected += 1;
+            }
+        });
+
+        return Object.values(dataMap);
+    };
 
     const handleApprove = async (id) => {
         try {
@@ -180,6 +201,7 @@ export function RestaurantsManagement() {
                     active={activeRestaurants.length}
                     pending={pendingRestaurants.length}
                     locked={lockedRestaurants.length}
+                    rate={approvalRate}
                 />
 
                 <div className="tabs-wrapper">
@@ -269,7 +291,7 @@ export function RestaurantsManagement() {
                 )}
 
                 {activeTab === 'pending' && (
-                    <ApprovalChart data={analyticsData} />
+                    <ApprovalChart data={getChartData()} />
                 )}
             </div>
         </div>
