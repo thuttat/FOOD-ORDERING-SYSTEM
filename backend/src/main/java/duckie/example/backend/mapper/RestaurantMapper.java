@@ -33,6 +33,7 @@ public class RestaurantMapper {
             restaurant.getOwner().getId(),
             restaurant.getOwner().getFullname(), 
             restaurant.getName(),
+            restaurant.getOwner().getEmail(),
             restaurant.getphone(),
             restaurant.getAddress(),
             restaurant.getDescription(),

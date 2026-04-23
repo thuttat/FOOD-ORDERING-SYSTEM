@@ -33,6 +33,10 @@ export function DetailPanel({restaurant, activeTab, onClose, onApprove, onReject
                                     <span className="info-value">{restaurant.ownerName || 'N/A'}</span>
                                 </div>
                                 <div className="info-row">
+                                    <span className="info-label">Email:</span>
+                                    <span className="info-value">{restaurant.email || 'N/A'}</span>
+                                </div>
+                                <div className="info-row">
                                     <span className="info-label">Phone number:</span>
                                     <span className="info-value">{restaurant.phoneNumber || 'N/A'}</span>
                                 </div>

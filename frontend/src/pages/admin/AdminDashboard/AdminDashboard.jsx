@@ -77,7 +77,7 @@ export function AdminDashboard() {
                 <h1>Admin Dashboard</h1>
                 <div className="stats-grid">
                     <StatsCard
-                        title="Total Active Users"
+                        title="Total Users"
                         value={stats.totalActiveUsers.toLocaleString()}
                         icon={<Users />}
                         iconClass="primary"
@@ -86,7 +86,7 @@ export function AdminDashboard() {
                     />
 
                     <StatsCard
-                        title="Active Restaurants"
+                        title="Total Restaurants"
                         value={stats.totalActiveRestaurants.toLocaleString()}
                         subtext="Verified partners"
                         icon={<Store />}

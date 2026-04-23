@@ -8,7 +8,7 @@ export function StatsSection({ active, pending, locked, rate }) {
             <StatsCard
                 title="Active"
                 value={active}
-                subtext="+12 this month"
+                subtext="Active restaurants"
                 subtextClass="success"
                 icon={<BadgeCheck />}
                 iconClass="primary"
@@ -35,7 +35,7 @@ export function StatsSection({ active, pending, locked, rate }) {
             <StatsCard
                 title="Approval Rate"
                 value={`${rate}%`}
-                subtext="Last 30 days"
+                subtext="Out of the total"
                 subtextClass="muted"
                 icon={<TrendingUp />}
                 iconClass="success"

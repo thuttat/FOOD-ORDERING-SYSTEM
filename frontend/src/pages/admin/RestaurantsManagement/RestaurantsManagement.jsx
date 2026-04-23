@@ -12,6 +12,7 @@ import { DetailPanel } from './components/DetailPanel.jsx';
 import { RejectModal } from './components/RejectModal.jsx';
 import { ApprovalChart } from './components/ApprovalChart.jsx';
 import {StatsSection} from "./components/StatsSection.jsx";
+import {Pagination} from "../../../components/common/Pagination.jsx";
 
 export function RestaurantsManagement() {
     const [activeTab, setActiveTab] = useState('active');
@@ -22,6 +23,12 @@ export function RestaurantsManagement() {
     const [restaurants, setRestaurants] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [rejectingId, setRejectingId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const ITEMS_PER_PAGE = 10;
+
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [activeTab, searchQuery]);
 
     const fetchRestaurants = async () => {
         try {
@@ -56,6 +63,17 @@ export function RestaurantsManagement() {
     const activeRestaurants = filteredRestaurants.filter(r => r.status === "ACTIVE");
     const pendingRestaurants = filteredRestaurants.filter(r => r.status === "PENDING");
     const lockedRestaurants = filteredRestaurants.filter(r => r.status === "LOCKED");
+
+    let currentTabList = [];
+    if (activeTab === 'active') currentTabList = activeRestaurants;
+    else if (activeTab === 'pending') currentTabList = pendingRestaurants;
+    else if (activeTab === 'suspended') currentTabList = lockedRestaurants;
+
+    const totalPages = Math.ceil(currentTabList.length / ITEMS_PER_PAGE);
+    const paginatedData = currentTabList.slice(
+        currentPage * ITEMS_PER_PAGE,
+        (currentPage + 1) * ITEMS_PER_PAGE
+    );
 
     const totalProcessed = activeRestaurants.length + lockedRestaurants.length;
     const approvalRate = totalProcessed === 0 ? 0 : Math.round((activeRestaurants.length / totalProcessed) * 100);
@@ -122,7 +140,7 @@ export function RestaurantsManagement() {
 
     const handleSelectAll = (e) => {
         if (e.target.checked) {
-            const allPendingIds = pendingRestaurants.map(r => r.id);
+            const allPendingIds = paginatedData.map(r => r.id);
             setSelectedForApproval(new Set(allPendingIds));
         } else {
             setSelectedForApproval(new Set());
@@ -236,34 +254,49 @@ export function RestaurantsManagement() {
                 ) : (
                     <>
                         {activeTab === 'active' && (
-                            <ActiveRestaurants
-                                restaurants={activeRestaurants}
-                                onSelect={setSelectedRestaurant}
-                                onSuspend={handleLock}
-                            />
+                            <>
+                                <ActiveRestaurants
+                                    restaurants={paginatedData}
+                                    onSelect={setSelectedRestaurant}
+                                    onSuspend={handleLock}
+                                />
+                                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                                    <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
+                                </div>
+                            </>
                         )}
 
                         {activeTab === 'pending' && (
-                            <PendingTable
-                                restaurants={pendingRestaurants}
-                                selectedForApproval={selectedForApproval}
-                                isAllSelected={isAllSelected}
-                                onToggleSelection={toggleSelection}
-                                onSelectAll={handleSelectAll}
-                                onSelect={setSelectedRestaurant}
-                                onApprove={handleApprove}
-                                onRejectClick={openRejectModal}
-                                formatDate={formatDate}
-                            />
+                            <>
+                                <PendingTable
+                                    restaurants={paginatedData}
+                                    selectedForApproval={selectedForApproval}
+                                    isAllSelected={isAllSelected}
+                                    onToggleSelection={toggleSelection}
+                                    onSelectAll={handleSelectAll}
+                                    onSelect={setSelectedRestaurant}
+                                    onApprove={handleApprove}
+                                    onRejectClick={openRejectModal}
+                                    formatDate={formatDate}
+                                />
+                                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                                    <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
+                                </div>
+                            </>
                         )}
 
                         {activeTab === 'suspended' && (
-                            <SuspendedTable
-                                restaurants={lockedRestaurants}
-                                onSelect={setSelectedRestaurant}
-                                onReinstate={handleReinstate}
-                                formatDate={formatDate}
-                            />
+                            <>
+                                <SuspendedTable
+                                    restaurants={paginatedData}
+                                    onSelect={setSelectedRestaurant}
+                                    onReinstate={handleReinstate}
+                                    formatDate={formatDate}
+                                />
+                                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                                    <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
+                                </div>
+                            </>
                         )}
                     </>
                 )}
