@@ -55,7 +55,10 @@ public class OrderMapper {
         return new OrderResponse(
             order.getId(),
             order.getCustomer().getId(),
+            order.getCustomer().getFullname(),
+            order.getCustomer().getEmail(),
             order.getRestaurant().getId(),
+            order.getRestaurant().getName(),
             order.getTotalAmount(),
             order.getDeliveryFee(),
             order.getStatus() != null ? order.getStatus().name() : null,

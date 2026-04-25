@@ -5,8 +5,8 @@ export const RestaurantService = {
         return axiosClient.get(`/admin/restaurants?page=${page}&size=${size}`);
     },
 
-    approveRestaurant: (id) => {
-        return axiosClient.patch(`/admin/restaurants/${id}/approve`, {})
+    createRestaurant: (data) => {
+        return axiosClient.post('/admin/restaurants', data);
     },
 
     lockRestaurant: (id) => {

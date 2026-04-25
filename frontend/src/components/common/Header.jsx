@@ -3,6 +3,8 @@ import { Button } from "./Button.jsx";
 import {ShoppingCart, Search, Bell, House, ChefHat, NotepadText} from "lucide-react";
 import "./../styles/Header.css";
 import {useAuth} from "../../services/AuthContext.jsx";
+import {useEffect, useRef, useState} from "react";
+import axiosClient from "../../apis/AxiosClient.js";
 
 export function Header({
                            showSearch = false,
@@ -11,6 +13,9 @@ export function Header({
                        }) {
     const navigate = useNavigate();
     const {user, role, logout} = useAuth();
+    const [notifications, setNotifications] = useState([]);
+    const [showNotifMenu, setShowNotifMenu] = useState(false);
+    const notifMenuRef = useRef(null);
 
     const handleLogout = () => {
         logout();
@@ -22,6 +27,37 @@ export function Header({
         if (role === "RESTAURANT") return "/restaurant";
         return "/";
     };
+
+    const fetchNotifications = async () => {
+        if (!user) return;
+        try {
+            const res = await axiosClient.get('/notifications');
+            setNotifications(res.data || []);
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchNotifications();
+        const intervalId = setInterval(() => {
+            fetchNotifications();
+        }, 15000);
+
+        return () => clearInterval(intervalId);
+    }, [user]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notifMenuRef.current && !notifMenuRef.current.contains(event.target)) {
+                setShowNotifMenu(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const unreadCount = notifications.filter(n => !n.isRead).length;
 
     return (
         <header className="header">
@@ -62,9 +98,44 @@ export function Header({
 
                     {user ? (
                         <>
-                            <div className="notification">
-                                <Bell size={20} />
-                                <span className="notification-badge">3</span>
+                            <div className="notification-wrapper" ref={notifMenuRef} style={{ position: 'relative' }}>
+                                <div className="notification" onClick={() => setShowNotifMenu(!showNotifMenu)} style={{ cursor: 'pointer' }}>
+                                    <Bell size={20} />
+                                    {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
+                                </div>
+
+                                {showNotifMenu && (
+                                    <div style={{
+                                        position: 'absolute', top: '40px', right: '-10px', width: '300px',
+                                        backgroundColor: '#fff', border: '1px solid #e5e7eb',
+                                        borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                                        zIndex: 1000, overflow: 'hidden'
+                                    }}>
+                                        <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', fontWeight: 600 }}>
+                                            Your notifications
+                                        </div>
+                                        <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                                            {notifications.length === 0 ? (
+                                                <div style={{ padding: '20px', textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>
+                                                    No notification.
+                                                </div>
+                                            ) : (
+                                                notifications.map(n => (
+                                                    <div key={n.id} style={{
+                                                        padding: '12px 16px', borderBottom: '1px solid #f3f4f6',
+                                                        backgroundColor: n.isRead ? '#fff' : '#f0f9ff',
+                                                        cursor: 'pointer'
+                                                    }}>
+                                                        <div style={{ fontSize: '14px', color: '#111827', marginBottom: '4px' }}>{n.message}</div>
+                                                        <div style={{ fontSize: '12px', color: '#6b7280' }}>
+                                                            {new Date(n.createdAt).toLocaleString('vi-VN')}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="user-info">

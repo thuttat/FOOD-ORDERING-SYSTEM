@@ -13,6 +13,10 @@ const UserService = {
         return axiosClient.patch(`users/${id}`, data);
     },
 
+    createUserByAdmin: (data) => {
+        return axiosClient.post("/users/admin/create", data);
+    },
+
     updateStatus: (id, status) => {
         return axiosClient.put(`users/admin/${id}/status?status=${status}`);
     },

@@ -48,14 +48,6 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurantService.createRestaurant(request, true));
     }
 
-    @GetMapping("/admin/restaurants/pending")
-    public ResponseEntity<List<RestaurantResponse>> getPendingRestaurants(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<RestaurantResponse> restaurantResponse = restaurantService.getPendingRestaurants(page, size);
-        return ResponseEntity.ok(restaurantResponse.getContent());
-    }
-
     @PatchMapping("/admin/restaurants/{id}/approve")
     public ResponseEntity<RestaurantResponse> approveRestaurant(@PathVariable Long id) {
         return ResponseEntity.ok(restaurantService.approveRestaurant(id));

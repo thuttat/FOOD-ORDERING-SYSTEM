@@ -2,7 +2,7 @@ import React from "react";
 import { StatsCard } from "../../../../components/common/StatsCard.jsx";
 import { BadgeCheck, BadgeAlert, BadgeX, TrendingUp } from "lucide-react";
 
-export function StatsSection({ active, pending, locked, rate }) {
+export function StatsSection({ active, pending, locked }) {
     return (
         <div className="stats-grid">
             <StatsCard
@@ -30,15 +30,6 @@ export function StatsSection({ active, pending, locked, rate }) {
                 subtextClass="destructive"
                 icon={<BadgeX />}
                 iconClass="destructive"
-            />
-
-            <StatsCard
-                title="Approval Rate"
-                value={`${rate}%`}
-                subtext="Out of the total"
-                subtextClass="muted"
-                icon={<TrendingUp />}
-                iconClass="success"
             />
         </div>
     );

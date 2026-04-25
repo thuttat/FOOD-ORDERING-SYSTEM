@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import duckie.example.backend.dto.UserRequest;
 import duckie.example.backend.entity.Role;
+import duckie.example.backend.exception.DuplicateResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -111,5 +113,27 @@ public class UserService {
                 "activeRestaurants", activeRestaurants,
                 "growthData", growthData
         );
+    }
+
+    @Transactional
+    public UserResponse createUserByAdmin(UserRequest  request) {
+        if (userRepository.existsByUsername(request.username())) {
+            throw new DuplicateResourceException("Username already exists: " + request.username());
+        }
+        if (userRepository.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("Email already exists: " + request.email());
+        }
+        Role assignedRole = request.role() != null ? request.role() : Role.USER;
+
+        User user = User.builder()
+                .fullname(request.fullname())
+                .username(request.username())
+                .email(request.email())
+                .phone(request.phone())
+                .password(passwordEncoder.encode("123456"))
+                .role(assignedRole)
+                .status(UserStatus.ACTIVE)
+                .build();
+        return userMapper.toResponse(userRepository.save(user));
     }
 }

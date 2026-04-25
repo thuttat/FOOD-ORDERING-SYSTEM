@@ -1,12 +1,15 @@
 package duckie.example.backend.repository;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import duckie.example.backend.dto.ChartData;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import duckie.example.backend.dto.StatusChartData;
@@ -42,4 +45,22 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "GROUP BY FUNCTION('MONTH', o.createdAt) " +
             "ORDER BY FUNCTION('MONTH', o.createdAt) ASC")
     List<Object[]> getRawMonthlyRevenueData();
+
+    @Query("SELECT o FROM Order o WHERE " +
+            "(:search IS NULL OR CAST(o.id AS string) LIKE %:search% OR LOWER(o.customer.fullname) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "(:status IS NULL OR o.status = :status) AND " +
+            "(:restaurantName IS NULL OR o.restaurant.name = :restaurantName)")
+    Page<Order> findAdminOrders(
+            @Param("search") String search,
+            @Param("status") duckie.example.backend.entity.OrderStatus status,
+            @Param("restaurantName") String restaurantName,
+            Pageable pageable);
+
+    @Query(value = "SELECT CAST(created_at AS DATE) as order_date, " +
+            "SUM(CASE WHEN status = 'DELIVERED' THEN 1 ELSE 0 END) as completed, " +
+            "SUM(CASE WHEN status = 'CANCELLED' THEN 1 ELSE 0 END) as cancelled " +
+            "FROM orders " +
+            "WHERE created_at >= :startDate " +
+            "GROUP BY CAST(created_at AS DATE) ORDER BY order_date ASC", nativeQuery = true)
+    List<Object[]> getOrderStatsLast7Days(@Param("startDate") Instant startDate);
 }
