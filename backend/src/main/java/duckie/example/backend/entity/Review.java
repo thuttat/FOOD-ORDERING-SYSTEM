@@ -1,16 +1,7 @@
 package duckie.example.backend.entity;
 
 import java.time.Instant;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "reviews")
@@ -27,6 +18,10 @@ public class Review extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false, unique = true)
+    private Order order;
 
     @Column(nullable = false)
     private Integer rating;
@@ -45,6 +40,9 @@ public class Review extends BaseEntity {
     public Restaurant getRestaurant() { return restaurant; }
     public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
 
+    public Order getOrder() { return order; }
+    public void setOrder(Order order) { this.order = order; }
+
     public Integer getRating() { return rating; }
     public void setRating(Integer rating) { this.rating = rating; }
 
@@ -57,6 +55,7 @@ public class Review extends BaseEntity {
         private Long id;
         private User customer;
         private Restaurant restaurant;
+        private Order order;
         private Integer rating;
         private String comment;
         private Instant createdAt;
@@ -65,6 +64,8 @@ public class Review extends BaseEntity {
         public ReviewBuilder id(Long id) { this.id = id; return this; }
         public ReviewBuilder customer(User customer) { this.customer = customer; return this; }
         public ReviewBuilder restaurant(Restaurant restaurant) { this.restaurant = restaurant; return this; }
+        public ReviewBuilder order(Order order) { this.order = order; return this; }
+
         public ReviewBuilder rating(Integer rating) { this.rating = rating; return this; }
         public ReviewBuilder comment(String comment) { this.comment = comment; return this; }
         public ReviewBuilder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
@@ -75,6 +76,7 @@ public class Review extends BaseEntity {
             review.setId(this.id);
             review.setCustomer(this.customer);
             review.setRestaurant(this.restaurant);
+            review.setOrder(this.order);
             review.setRating(this.rating);
             review.setComment(this.comment);
             review.setCreatedAt(this.createdAt);

@@ -4,12 +4,8 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import duckie.example.backend.dto.ReviewRequest;
 import duckie.example.backend.dto.ReviewResponse;
@@ -25,19 +21,21 @@ public class ReviewController {
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
-
-    private User getMockUser() {
-        return User.builder().id(1L).build(); 
-    }
-
     @PostMapping("/reviews")
-    public ResponseEntity<ReviewResponse> createReview(@Valid @RequestBody ReviewRequest request) {
-        ReviewResponse response = reviewService.createReview(request, getMockUser());
+    public ResponseEntity<ReviewResponse> createReview(
+            @Valid @RequestBody ReviewRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        ReviewResponse response = reviewService.createReview(request, currentUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/restaurants/{restaurantId}/reviews")
     public ResponseEntity<List<ReviewResponse>> getRestaurantReviews(@PathVariable Long restaurantId) {
         return ResponseEntity.ok(reviewService.getReviewsByRestaurant(restaurantId));
+    }
+
+    @GetMapping("/restaurants/{restaurantId}/average-rating")
+    public ResponseEntity<Double> getAverageRating(@PathVariable Long restaurantId) {
+        return ResponseEntity.ok(reviewService.getAverageRating(restaurantId));
     }
 }
