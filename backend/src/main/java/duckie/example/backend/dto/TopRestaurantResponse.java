@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public record TopRestaurantResponse(
         Long id,
         String name,
-        long orderCount,
+        Long orderCount,
         BigDecimal revenue,
         Double rating
 ) {

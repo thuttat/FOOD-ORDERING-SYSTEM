@@ -38,4 +38,17 @@ public class OrderController {
         OrderResponse updatedOrder = orderService.updateOrderStatus(orderId, status);
         return ResponseEntity.ok(updatedOrder);
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<OrderResponse>> getMyOrders(
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(orderService.getMyOrderHistory(currentUser));
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderResponse> getOrderDetails(
+            @PathVariable Long orderId,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(orderService.getOrderDetail(orderId, currentUser));
+    }
 }

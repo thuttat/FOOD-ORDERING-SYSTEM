@@ -22,21 +22,19 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import duckie.example.backend.security.CustomAccessDeniedHandler;
 import duckie.example.backend.security.JwtAuthenticationEntryPoint;
 import duckie.example.backend.security.JwtAuthenticationFilter;
-import duckie.example.backend.security.JwtService;
-import duckie.example.backend.security.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
-    
+
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
-            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-            CustomAccessDeniedHandler customAccessDeniedHandler) {
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.customAccessDeniedHandler = customAccessDeniedHandler;
@@ -53,13 +51,12 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN") 
-
-                        
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu-items/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/restaurants/**").permitAll()
                         .requestMatchers("/api/payments/vnpay-callback", "/api/payments/momo-callback").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -72,32 +69,26 @@ public class SecurityConfig {
 
         return http.build();
     }
-    
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); 
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "x-auth-token"));
-        configuration.setAllowCredentials(true); 
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); 
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-    
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
-    }
-
-    // @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(JwtService jwtService, UserDetailsServiceImpl userDetailsService) {
-        return new JwtAuthenticationFilter(jwtService, userDetailsService);
     }
 }

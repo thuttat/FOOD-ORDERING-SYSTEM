@@ -56,6 +56,7 @@ public class OrderMapper {
             order.getId(),
             order.getCustomer().getId(),
             order.getRestaurant().getId(),
+            order.getRestaurant().getName(),
             order.getTotalAmount(),
             order.getDeliveryFee(),
             order.getStatus() != null ? order.getStatus().name() : null,

@@ -20,42 +20,51 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private static final Logger log=LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService){
-        this.jwtService=jwtService;
-        this.userDetailsService=userDetailsService;
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) 
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/api/auth/") ||
+                path.startsWith("/public/") ||
+                path.startsWith("/h2-console");
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            String jwt=getJwtFromRequest(request);
-            if(StringUtils.hasText(jwt)&&SecurityContextHolder.getContext().getAuthentication()==null){
-                String username=jwtService.extractUsername(jwt);
-                if(username!=null){
-                    UserDetails userDetails=userDetailsService.loadUserByUsername(username);
-                    if(jwtService.validateToken(jwt,userDetails)){
-                        UsernamePasswordAuthenticationToken authentication= 
-                            new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
+            String jwt = getJwtFromRequest(request);
+            if (StringUtils.hasText(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String username = jwtService.extractUsername(jwt);
+                if (username != null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                    if (jwtService.validateToken(jwt, userDetails)) {
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
                 }
             }
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
 
+            log.error("Không thể thiết lập xác thực người dùng trong Security Context", ex);
         }
+
         filterChain.doFilter(request, response);
     }
-    
+
     private String getJwtFromRequest(HttpServletRequest request){
-        String bearerToken=request.getHeader("Authorization");
-        if(StringUtils.hasText(bearerToken)&&bearerToken.startsWith("Bearer")){
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;

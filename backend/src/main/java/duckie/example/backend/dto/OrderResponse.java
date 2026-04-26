@@ -10,7 +10,7 @@ public record OrderResponse(
     Long customerId,
 
     Long restaurantId,
-
+    String restaurantName,
     BigDecimal totalAmount,
 
     BigDecimal deliveryFee,

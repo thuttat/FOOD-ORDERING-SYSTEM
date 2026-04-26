@@ -1,0 +1,5 @@
+$kind: http-request
+name: GET CATEGORY http://localhost:8080/api/menu-items/category/1
+url: http://localhost:8080/api/menu-items/category/1
+method: GET
+order: 4378379213091122

@@ -124,4 +124,23 @@ public class OrderService {
             logger.error("RabbitMQ Notification Failed: {}", e.getMessage());
         }
     }
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getMyOrderHistory(User currentUser) {
+        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(currentUser.getId())
+                .stream()
+                .map(orderMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderDetail(Long orderId, User currentUser) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Connot find your order: " + orderId));
+
+        if (!order.getCustomer().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("It's not yours!");
+        }
+
+        return orderMapper.toResponse(order);
+    }
 }

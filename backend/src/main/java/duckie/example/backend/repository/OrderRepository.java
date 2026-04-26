@@ -26,10 +26,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     BigDecimal calculateRevenueThisMonth();
 
     @Query("SELECT new duckie.example.backend.dto.TopRestaurantResponse(" +
-           "r.id, r.name, COUNT(o), SUM(o.totalAmount), 5.0) " +
-           "FROM Order o JOIN o.restaurant r " +
-           "WHERE month(o.createdAt) = month(current_date) " +
-           "GROUP BY r.id, r.name " +
-           "ORDER BY COUNT(o) DESC, SUM(o.totalAmount) DESC")
+            "r.id, r.name, COUNT(o), SUM(o.totalAmount), 5.0) " +
+            "FROM Order o JOIN o.restaurant r " +
+            "WHERE month(o.createdAt) = month(current_date) " +
+            "GROUP BY r.id, r.name " +
+            "ORDER BY COUNT(o) DESC, SUM(o.totalAmount) DESC")
     List<TopRestaurantResponse> findTop5Restaurants(Pageable pageable);
+    List<Order> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
 }
