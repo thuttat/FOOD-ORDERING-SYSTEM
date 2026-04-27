@@ -33,6 +33,7 @@ public class ReviewMapper {
         return new ReviewResponse(
                 review.getId(),
                 review.getRestaurant().getId(),
+                review.getRestaurant().getName(),
                 review.getCustomer().getId(),
                 review.getCustomer().getFullname(),
                 review.getRating(),

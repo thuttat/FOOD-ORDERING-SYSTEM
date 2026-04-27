@@ -12,31 +12,6 @@
     color: var(--muted-foreground);
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-}
-
-.tabs {
-    display: flex;
-    gap: 16px;
-    border-bottom: 1px solid var(--border);
-}
-
-.tabs button {
-    padding: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--muted-foreground);
-}
-
-.tabs button.active {
-    border-bottom: 2px solid var(--primary);
-    color: var(--foreground);
-}
-
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -51,11 +26,6 @@
 
 .table tr:hover {
     background: var(--secondary);
-}
-
-.text-muted {
-    color: var(--muted-foreground);
-    font-size: 13px;
 }
 
 .stars {
@@ -100,32 +70,6 @@
 
 .actions .danger {
     color: red;
-}
-
-.reported-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.reported-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.reported-meta {
-    display: flex;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--muted-foreground);
-}
-
-.report-box {
-    padding: 10px;
-    background: #ffe5e5;
-    border-radius: 8px;
-    font-size: 14px;
 }
 
 .charts {
