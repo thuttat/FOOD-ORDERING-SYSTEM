@@ -33,4 +33,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "ORDER BY COUNT(o) DESC, SUM(o.totalAmount) DESC")
     List<TopRestaurantResponse> findTop5Restaurants(Pageable pageable);
     List<Order> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
+
 }

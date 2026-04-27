@@ -1,0 +1,18 @@
+$kind: http-request
+name: POST ITEMS http://localhost:8080/api/cart/items
+url: http://localhost:8080/api/cart/items
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"menuItemId\": 1, \r
+
+    \  \"quantity\": 2\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJraGFjaHRlc3QiLCJpYXQiOjE3NzcyNzU3MjAsImV4cCI6MTc3NzI3NjYyMH0.R7sY_g2eQ8NDo890rSyggGbAjURmqmkkOGfWRIHa_XraSdz0o_yopbivOmP0aDGb
+order: 4488750151054126

@@ -1,0 +1,9 @@
+$kind: http-request
+name: GET CART http://localhost:8080/api/cart
+url: http://localhost:8080/api/cart
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJraGFjaHRlc3QiLCJpYXQiOjE3NzcyNzU3MjAsImV4cCI6MTc3NzI3NjYyMH0.R7sY_g2eQ8NDo890rSyggGbAjURmqmkkOGfWRIHa_XraSdz0o_yopbivOmP0aDGb
+order: 4433972155163057
