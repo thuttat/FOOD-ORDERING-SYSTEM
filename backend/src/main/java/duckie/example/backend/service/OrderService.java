@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import duckie.example.backend.dto.StatusChartData;
+import duckie.example.backend.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -40,15 +41,11 @@ import duckie.example.backend.entity.User;
 import duckie.example.backend.mapper.OrderItemMapper;
 import duckie.example.backend.mapper.OrderMapper;
 import duckie.example.backend.mapper.PaymentMapper;
-import duckie.example.backend.repository.CartItemRepository;
-import duckie.example.backend.repository.CartRepository;
-import duckie.example.backend.repository.OrderRepository;
-import duckie.example.backend.repository.PaymentRepository;
 
 @Service
 public class OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
-
+    private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
@@ -58,10 +55,11 @@ public class OrderService {
     private final PaymentMapper paymentMapper;
     private final RabbitTemplate rabbitTemplate;
 
-    public OrderService(OrderRepository orderRepository, CartRepository cartRepository,
+    public OrderService(UserRepository userRepository, OrderRepository orderRepository, CartRepository cartRepository,
                         CartItemRepository cartItemRepository, PaymentRepository paymentRepository,
                         OrderMapper orderMapper, OrderItemMapper orderItemMapper,
                         PaymentMapper paymentMapper, RabbitTemplate rabbitTemplate) {
+        this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
@@ -73,7 +71,10 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse createOrder(User customer, OrderRequest request) {
+    public OrderResponse createOrder(String username, OrderRequest request) {
+        User customer = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Can not find this user"));
+
         Cart cart = cartRepository.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new RuntimeException("Cart does not exist"));
 
@@ -97,18 +98,18 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        PaymentMethod method = request.paymentMethod(); 
-        
+        PaymentMethod method = request.paymentMethod();
+
         Payment payment = paymentMapper.toEntity(
-            new PaymentRequest(savedOrder.getId(), method, savedOrder.getTotalAmount()), 
-            savedOrder, 
-            "TXN_" + System.currentTimeMillis()
+                new PaymentRequest(savedOrder.getId(), method, savedOrder.getTotalAmount()),
+                savedOrder,
+                "TXN_" + System.currentTimeMillis()
         );
         paymentRepository.save(payment);
         cartItemRepository.deleteByCartId(cart.getId());
-        
+
         sendNotification("Bill created: #" + savedOrder.getId());
-        
+
         return orderMapper.toResponse(savedOrder);
     }
 
@@ -119,19 +120,19 @@ public class OrderService {
 
         order.setStatus(newStatus);
         Order savedOrder = orderRepository.save(order);
-        
+
         String message = String.format("Bill #%d changed status into : %s", savedOrder.getId(), newStatus.name());
         sendNotification(message);
-        
+
         return orderMapper.toResponse(savedOrder);
     }
 
     private void sendNotification(String message) {
         try {
             rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE_ORDER, 
-                RabbitMQConfig.ROUTING_KEY_ORDER, 
-                message
+                    RabbitMQConfig.EXCHANGE_ORDER,
+                    RabbitMQConfig.ROUTING_KEY_ORDER,
+                    message
             );
             logger.info("RabbitMQ Notification Success: {}", message);
         } catch (Exception e) {
@@ -155,7 +156,8 @@ public class OrderService {
         List<StatusChartData> statuses = orderRepository.countOrderByStatusThisMonth();
         for (StatusChartData s : statuses) {
             if (s.status() == OrderStatus.PENDING) pending += s.count();
-            if (s.status() == OrderStatus.PREPARING || s.status() == OrderStatus.OUT_FOR_DELIVERY) inProgress += s.count();
+            if (s.status() == OrderStatus.PREPARING || s.status() == OrderStatus.OUT_FOR_DELIVERY)
+                inProgress += s.count();
             if (s.status() == OrderStatus.DELIVERED) delivered += s.count();
         }
 
@@ -194,5 +196,30 @@ public class OrderService {
                 "delivered", delivered,
                 "chartData", chartData
         );
+    }
+
+    public List<OrderResponse> getMyOrderHistory(String username) {
+        User customerUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("cannot find this user!"));
+
+        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerUser.getId()) // Đã đổi biến
+                .stream()
+                .map(orderMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderDetail(Long orderId, String username) {
+        User customerUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("cannot find this user!"));
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Connot find your order: " + orderId));
+
+        if (!order.getCustomer().getId().equals(customerUser.getId())) {
+            throw new RuntimeException("It's not yours!");
+        }
+
+        return orderMapper.toResponse(order);
     }
 }

@@ -2,6 +2,7 @@ package duckie.example.backend.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import duckie.example.backend.dto.CartItemRequest;
 import duckie.example.backend.dto.CartResponse;
-import duckie.example.backend.entity.User;
 import duckie.example.backend.service.CartService;
 import jakarta.validation.Valid;
 
@@ -27,22 +27,22 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(cartService.getCart(currentUser));
+    public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(cartService.getCart(userDetails.getUsername()));
     }
 
     @PostMapping("/items")
     public ResponseEntity<CartResponse> addItem(
             @Valid @RequestBody CartItemRequest request,
-            @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(cartService.addItemToCart(currentUser, request));
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(cartService.addItemToCart(userDetails.getUsername(), request));
     }
 
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> updateItemQuantity(
-            @PathVariable Long cartItemId, 
+            @PathVariable Long cartItemId,
             @RequestParam Integer quantity,
-            @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(cartService.updateCartItem(currentUser, cartItemId, quantity));
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(cartService.updateCartItem(userDetails.getUsername(), cartItemId, quantity));
     }
 }

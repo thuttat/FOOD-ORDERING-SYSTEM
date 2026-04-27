@@ -38,6 +38,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "GROUP BY r.id, r.name " +
             "ORDER BY COUNT(DISTINCT o) DESC, SUM(o.totalAmount) DESC")
     List<TopRestaurantResponse> findTop5Restaurants(Pageable pageable);
+    List<Order> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
 
     @Query("SELECT FUNCTION('MONTH', o.createdAt), SUM(o.totalAmount) " +
             "FROM Order o " +

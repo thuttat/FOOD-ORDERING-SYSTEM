@@ -1,0 +1,14 @@
+$kind: http-request
+name: PUT QUANTITY http://localhost:8080/api/cart/items/1?quantity=3
+url: http://localhost:8080/api/cart/items/1?quantity=3
+method: PUT
+queryParams:
+  quantity: "3"
+body:
+  type: json
+  content: ""
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJraGFjaHRlc3QiLCJpYXQiOjE3NzcyNzgzMDIsImV4cCI6MTc3NzI3OTIwMn0.dHLkSjikppnm03xcu8T48-OL5C0wkCY8X66RJOnd_Xcv5nR1EaOWk1nQivvRnJq-
+order: 4501196828308102

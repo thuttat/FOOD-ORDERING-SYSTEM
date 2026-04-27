@@ -1,0 +1,22 @@
+$kind: http-request
+name: POST ORDER http://localhost:8080/api/orders
+url: http://localhost:8080/api/orders
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"restaurantId\": 1,\r
+
+    \  \"deliveryAddress\": \"123 Đường Số 1, Quận 1\",\r
+
+    //   \"customerNote\": \"Ít cay, nhiều rau\",\r
+
+    \  \"paymentMethod\": \"COD\" \r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJraGFjaHRlc3QiLCJpYXQiOjE3NzcyODE0MzksImV4cCI6MTc3NzI4MjMzOX0.Q-Uds7byTg1kJtee_t1mCbzYAm7nq6HmTHBLZpAJl2IhylmoR1wAftl-H5fUH2kC
+order: 4501709502702025

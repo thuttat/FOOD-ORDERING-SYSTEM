@@ -1,0 +1,7 @@
+$kind: http-request
+name: GET RESTAURANT http://localhost:8080/api/restaurants
+url: http://localhost:8080/api/restaurants
+method: GET
+auth:
+  type: bearer
+order: 4343785199278467

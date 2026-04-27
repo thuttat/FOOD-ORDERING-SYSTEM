@@ -1,0 +1,20 @@
+$kind: http-request
+name: POST LOGIN http://localhost:8080/api/auth/login
+url: http://localhost:8080/api/auth/login
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \  \"usernameOrEmail\": \"khachtest@gmail.com\",\r
+
+    \  \"password\": \"password123\"\r
+
+    }"
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJraGFjaHRlc3QiLCJpYXQiOjE3NzcyMTkxMTQsImV4cCI6MTc3NzIyMDAxNH0.Gjm5S648tbwrwnPgwAfYxKh-6tLTxSWz4Ax3NCmqsDENUjPIolQGI72RZHG_XcsJ
+order: 4170120055791768
