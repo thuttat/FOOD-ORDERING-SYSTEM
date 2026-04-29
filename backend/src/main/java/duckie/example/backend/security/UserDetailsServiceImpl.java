@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import duckie.example.backend.entity.User;
 import duckie.example.backend.repository.UserRepository;
 
-@Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;

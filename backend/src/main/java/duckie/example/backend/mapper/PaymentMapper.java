@@ -10,27 +10,36 @@ import duckie.example.backend.entity.PaymentStatus;
 
 @Component
 public class PaymentMapper {
+
     public Payment toEntity(PaymentRequest request, Order order, String transactionId) {
-        if (request == null) return null;
-        return Payment.builder()
-                .order(order)
-                .transactionId(transactionId)
-                .method(request.method()) 
-                .amount(request.amount())
-                .status(PaymentStatus.PENDING)
-                .build();
+        if (request == null || order == null) {
+            return null;
+        }
+
+        Payment payment = new Payment();
+        payment.setOrder(order);
+        payment.setMethod(request.method());
+        payment.setAmount(order.getTotalAmount());
+
+        payment.setTransactionId(transactionId);
+        payment.setStatus(PaymentStatus.PENDING);
+
+        return payment;
     }
 
-    public PaymentResponse toResponse(Payment payment, String paymentUrl) {
-        if (payment == null) return null;
+    public PaymentResponse toResponse(Payment payment) {
+        if (payment == null) {
+            return null;
+        }
+
         return new PaymentResponse(
                 payment.getId(),
                 payment.getOrder().getId(),
                 payment.getTransactionId(),
-                payment.getMethod().name(),
+                payment.getMethod() != null ? payment.getMethod().name() : null,
                 payment.getAmount(),
-                payment.getStatus().name(),
-                paymentUrl, 
+                payment.getStatus() != null ? payment.getStatus().name() : null,
+                "",
                 payment.getCreatedAt()
         );
     }

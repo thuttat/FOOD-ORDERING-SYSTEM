@@ -12,8 +12,9 @@ export function Cart() {
         try {
             const response = await CartService.getCart();
             setCart(response.data);
+            window.dispatchEvent(new Event('cartUpdated'));
         } catch (error) {
-            console.error("Invalid data:", error);
+            console.error("cannot find data:", error);
         } finally {
             setLoading(false);
         }
@@ -29,12 +30,12 @@ export function Cart() {
             await CartService.updateQuantity(itemId, newQuantity);
             fetchCartData();
         } catch (error) {
-            console.error("Updated error:", error);
+            console.error("uadated error:", error);
         }
     };
 
     const removeItem = async (itemId) => {
-        if (window.confirm("Are you sure deleting this one?")) {
+        if (window.confirm("are you sure for deleting?")) {
             try {
                 await CartService.removeItem(itemId);
                 fetchCartData();
@@ -49,10 +50,9 @@ export function Cart() {
     return (
         <div className="cart-page-container">
             <h2 className="cart-title">Your cart</h2>
-            
+
             {cart?.items?.length > 0 ? (
                 <div className="cart-main-layout">
-
                     <div className="cart-items-section">
                         {cart.items.map((item) => (
                             <CartItem
@@ -65,19 +65,15 @@ export function Cart() {
                     </div>
 
                     <div className="cart-summary-section">
-                        <OrderSummary total={cart.totalPrice} />
+                        <OrderSummary
+                            total={cart.totalAmount}
+                            cartData={cart}
+                        />
                     </div>
                 </div>
             ) : (
                 <div className="cart-empty-state">
-                    <div className="empty-icon">🛒</div>
-                    <p>Giỏ hàng của bạn hiện đang trống.</p>
-                    <button 
-                        className="btn-continue-shopping" 
-                        onClick={() => window.location.href = "/"}
-                    >
-                        Continue
-                    </button>
+                    <p>Blank.</p>
                 </div>
             )}
         </div>

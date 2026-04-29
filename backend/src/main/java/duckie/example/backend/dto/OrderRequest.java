@@ -11,8 +11,5 @@ public record OrderRequest(
     @NotBlank(message = "Pls fill your address")
     String deliveryAddress,
 
-    String customerNote,
-
-    @NotNull(message = "Pls fill your payment method")
-    PaymentMethod paymentMethod 
+    String customerNote
 ) {}

@@ -3,142 +3,198 @@ package duckie.example.backend.service;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-
+import java.util.*;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import duckie.example.backend.dto.PaymentResponse;
-import duckie.example.backend.entity.Order;
-import duckie.example.backend.entity.Payment;
-import duckie.example.backend.entity.PaymentMethod;
-import duckie.example.backend.entity.PaymentStatus;
-import duckie.example.backend.mapper.PaymentMapper;
-import duckie.example.backend.repository.OrderRepository;
-import duckie.example.backend.repository.PaymentRepository;
+import org.springframework.web.client.RestTemplate;
+import duckie.example.backend.dto.*;
+import duckie.example.backend.entity.*;
+import duckie.example.backend.repository.*;
 
 @Service
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
-    private final PaymentMapper paymentMapper;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
+    private final NotificationService notificationService;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    private final String VNP_TMNCODE = "2QX7C5XJ";
-    private final String VNP_HASHSECRET = "NCFNSVUECHNPBHSGZETMTIBBJSKOTUQX";
-    private final String VNP_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+    @Value("${app.payment.vnpay.tmn-code}") private String VNP_TMNCODE;
+    @Value("${app.payment.vnpay.hash-secret}") private String VNP_HASHSECRET;
+    @Value("${app.payment.vnpay.url}") private String VNP_URL;
+    @Value("${app.payment.vnpay.return-url}") private String VNP_RETURN_URL;
 
-    public PaymentService(PaymentRepository paymentRepository, OrderRepository orderRepository, PaymentMapper paymentMapper) {
+    @Value("${app.payment.momo.partner-code}") private String MOMO_PARTNER_CODE;
+    @Value("${app.payment.momo.access-key}") private String MOMO_ACCESS_KEY;
+    @Value("${app.payment.momo.secret-key}") private String MOMO_SECRET_KEY;
+    @Value("${app.payment.momo.endpoint}") private String MOMO_ENDPOINT;
+    @Value("${app.payment.momo.return-url}") private String MOMO_RETURN_URL;
+
+    public PaymentService(PaymentRepository paymentRepository, OrderRepository orderRepository,
+                          CartRepository cartRepository, CartItemRepository cartItemRepository,
+                          NotificationService notificationService) {
         this.paymentRepository = paymentRepository;
         this.orderRepository = orderRepository;
-        this.paymentMapper = paymentMapper;
+        this.cartRepository = cartRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
-    public PaymentResponse createPayment(Long orderId) {
-        Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new RuntimeException("Order not found"));
+    public PaymentResponse createPayment(PaymentRequest request) {
+        Order order = orderRepository.findById(request.orderId())
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        Payment payment = paymentRepository.findByOrderId(orderId)
-            .orElseThrow(() -> new RuntimeException("Payment record missing"));
+        Payment payment = paymentRepository.findByOrderId(order.getId()).orElseGet(() -> {
+            Payment p = new Payment();
+            p.setOrder(order);
+            p.setAmount(order.getTotalAmount());
+            p.setTransactionId("TXN_" + System.currentTimeMillis());
+            p.setStatus(PaymentStatus.PENDING);
+            return p;
+        });
+        payment.setMethod(request.method());
 
-        String paymentUrl = "";
-        if (payment.getMethod() == PaymentMethod.VNPAY) {
-            paymentUrl = createVnPayUrl(order);
-        } else if (payment.getMethod() == PaymentMethod.MOMO) {
-            paymentUrl = "https://test-payment.momo.vn/v2/gateway/api/create?demo=true"; 
+        String url = (request.method() == PaymentMethod.VNPAY) ? createVnPayUrl(order) :
+                (request.method() == PaymentMethod.MOMO) ? createMomoUrl(order) : "/orders";
+
+        if (request.method() == PaymentMethod.COD) {
+            payment.setStatus(PaymentStatus.SUCCESS);
+            completeOrderProcess(order.getCustomer(), order.getId());
         }
 
-        return new PaymentResponse(
-            payment.getId(),
-            orderId,
-            payment.getTransactionId(),
-            payment.getMethod().name(),
-            payment.getAmount(),
-            payment.getStatus().name(),
-            paymentUrl,
-            payment.getCreatedAt()
-        );
+        paymentRepository.save(payment);
+        return new PaymentResponse(payment.getId(), order.getId(), payment.getTransactionId(),
+                payment.getMethod().name(), payment.getAmount(), payment.getStatus().name(), url, payment.getCreatedAt());
+    }
+
+    @Transactional
+    public void processMomoCallback(String orderIdUnique, Integer resultCode) {
+        Long id = Long.parseLong(orderIdUnique.split("_")[0]);
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        Payment p = paymentRepository.findByOrderId(id).orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        if (resultCode != null && resultCode == 0) {
+            p.setStatus(PaymentStatus.SUCCESS);
+            completeOrderProcess(order.getCustomer(), order.getId());
+        } else {
+            p.setStatus(PaymentStatus.FAILED);
+        }
+        paymentRepository.save(p);
+    }
+
+    @Transactional
+    public void processPaymentCallback(String txnRef, String status) {
+        Long id = Long.parseLong(txnRef.split("_")[0]);
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        Payment p = paymentRepository.findByOrderId(id).orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        if ("00".equals(status)) {
+            p.setStatus(PaymentStatus.SUCCESS);
+            completeOrderProcess(order.getCustomer(), order.getId());
+        } else {
+            p.setStatus(PaymentStatus.FAILED);
+        }
+        paymentRepository.save(p);
+    }
+
+    private void completeOrderProcess(User customer, Long orderId) {
+        cartRepository.findByCustomerId(customer.getId()).ifPresent(cart -> {
+            cartItemRepository.deleteByCartId(cart.getId());
+        });
+        notificationService.createAndSaveNotification(customer, "Order #" + orderId + " placed successfully!", "ORDER");
     }
 
     private String createVnPayUrl(Order order) {
-        Map<String, String> vnp_Params = new HashMap<>();
-        vnp_Params.put("vnp_Version", "2.1.0");
-        vnp_Params.put("vnp_Command", "pay");
-        vnp_Params.put("vnp_TmnCode", VNP_TMNCODE);
-        vnp_Params.put("vnp_Amount", String.valueOf(order.getTotalAmount().multiply(java.math.BigDecimal.valueOf(100)).longValue()));
-        vnp_Params.put("vnp_CurrCode", "VND");
-        vnp_Params.put("vnp_TxnRef", order.getId().toString());
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang #" + order.getId());
-        vnp_Params.put("vnp_OrderType", "other");
-        vnp_Params.put("vnp_Locale", "vn");
-        vnp_Params.put("vnp_ReturnUrl", "http://localhost:5173/payment-result");
-        vnp_Params.put("vnp_IpAddr", "127.0.0.1");
+        Map<String, String> vnp = new HashMap<>();
+        vnp.put("vnp_Version", "2.1.0");
+        vnp.put("vnp_Command", "pay");
+        vnp.put("vnp_TmnCode", VNP_TMNCODE);
+        vnp.put("vnp_Amount", String.valueOf(order.getTotalAmount().multiply(java.math.BigDecimal.valueOf(100)).longValue()));
+        vnp.put("vnp_CurrCode", "VND");
+        String uniqueRef = order.getId() + "_" + UUID.randomUUID().toString().substring(0, 8);
+        vnp.put("vnp_TxnRef", uniqueRef);
+        vnp.put("vnp_OrderInfo", "Pay HappyFood #" + order.getId());
+        vnp.put("vnp_OrderType", "other");
+        vnp.put("vnp_Locale", "vn");
+        vnp.put("vnp_ReturnUrl", VNP_RETURN_URL);
+        vnp.put("vnp_IpAddr", "127.0.0.1");
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        vnp_Params.put("vnp_CreateDate", formatter.format(cld.getTime()));
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+7"));
+        vnp.put("vnp_CreateDate", formatter.format(new Date()));
 
-        List fieldNames = new ArrayList(vnp_Params.keySet());
-        Collections.sort(fieldNames);
-        StringBuilder hashData = new StringBuilder();
-        StringBuilder query = new StringBuilder();
-        Iterator itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = (String) itr.next();
-            String fieldValue = vnp_Params.get(fieldName);
-            if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII)).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
-                if (itr.hasNext()) {
-                    query.append('&');
-                    hashData.append('&');
-                }
-            }
-        }
-        String queryUrl = query.toString();
-        String vnp_SecureHash = hmacSHA512(VNP_HASHSECRET, hashData.toString());
-        return VNP_URL + "?" + queryUrl + "&vnp_SecureHash=" + vnp_SecureHash;
+        return buildUrl(VNP_URL, vnp, VNP_HASHSECRET, "HmacSHA512");
     }
 
-    public static String hmacSHA512(final String key, final String data) {
+    private String createMomoUrl(Order order) {
+        String reqId = String.valueOf(System.currentTimeMillis());
+        String orderIdUnique = order.getId() + "_" + System.currentTimeMillis();
+        String amount = String.valueOf(order.getTotalAmount().longValue());
+        String orderInfo = "Pay HappyFood #" + order.getId();
+
+        String rawSignature = "accessKey=" + MOMO_ACCESS_KEY +
+                "&amount=" + amount +
+                "&extraData=" +
+                "&ipnUrl=" + MOMO_RETURN_URL +
+                "&orderId=" + orderIdUnique +
+                "&orderInfo=" + orderInfo +
+                "&partnerCode=" + MOMO_PARTNER_CODE +
+                "&requestId=" + reqId +
+                "&requestType=captureWallet" +
+                "&returnUrl=" + MOMO_RETURN_URL;
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("partnerCode", MOMO_PARTNER_CODE);
+        body.put("accessKey", MOMO_ACCESS_KEY);
+        body.put("requestId", reqId);
+        body.put("amount", amount);
+        body.put("orderId", orderIdUnique);
+        body.put("orderInfo", orderInfo);
+        body.put("returnUrl", MOMO_RETURN_URL);
+        body.put("ipnUrl", MOMO_RETURN_URL);
+        body.put("extraData", "");
+        body.put("requestType", "captureWallet");
+        body.put("signature", hmac(MOMO_SECRET_KEY, rawSignature, "HmacSHA256"));
+        body.put("lang", "vi");
+
         try {
-            if (key == null || data == null) throw new NullPointerException();
-            final Mac hmac512 = Mac.getInstance("HmacSHA512");
-            byte[] hmacKeyBytes = key.getBytes();
-            final SecretKeySpec secretKey = new SecretKeySpec(hmacKeyBytes, "HmacSHA512");
-            hmac512.init(secretKey);
-            byte[] dataBytes = data.getBytes(StandardCharsets.UTF_8);
-            byte[] result = hmac512.doFinal(dataBytes);
-            StringBuilder sb = new StringBuilder(2 * result.length);
-            for (byte b : result) {
-                sb.append(String.format("%02x", b & 0xff));
+            Map<?, ?> res = restTemplate.postForObject(MOMO_ENDPOINT, body, Map.class);
+            if (res != null && res.containsKey("payUrl")) {
+                return (String) res.get("payUrl");
             }
-            return sb.toString();
-        } catch (Exception ex) {
-            return "";
+            throw new RuntimeException("Momo Response Empty");
+        } catch (Exception e) {
+            throw new RuntimeException("Momo Connection Error: " + e.getMessage());
         }
     }
 
-    @Transactional
-    public void processPaymentCallback(Long orderId, String status) {
-        Payment payment = paymentRepository.findByOrderId(orderId)
-            .orElseThrow(() -> new RuntimeException("Payment not found"));
-        
-        if ("00".equals(status)) { 
-            payment.setStatus(PaymentStatus.SUCCESS);
-        } else {
-            payment.setStatus(PaymentStatus.FAILED);
+    private String buildUrl(String url, Map<String, String> params, String secret, String algo) {
+        List<String> keys = new ArrayList<>(params.keySet()); Collections.sort(keys);
+        StringBuilder query = new StringBuilder(), hash = new StringBuilder();
+        for (String k : keys) {
+            String v = params.get(k);
+            if (v != null && !v.isEmpty()) {
+                hash.append(k).append('=').append(URLEncoder.encode(v, StandardCharsets.US_ASCII)).append('&');
+                query.append(URLEncoder.encode(k, StandardCharsets.US_ASCII)).append('=').append(URLEncoder.encode(v, StandardCharsets.US_ASCII)).append('&');
+            }
         }
-        paymentRepository.save(payment);
+        hash.setLength(hash.length() - 1); query.setLength(query.length() - 1);
+        return url + "?" + query + "&vnp_SecureHash=" + hmac(secret, hash.toString(), algo);
+    }
+
+    private String hmac(String key, String data, String algo) {
+        try {
+            Mac mac = Mac.getInstance(algo);
+            mac.init(new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), algo));
+            byte[] res = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : res) sb.append(String.format("%02x", b & 0xff));
+            return sb.toString();
+        } catch (Exception e) { return ""; }
     }
 }

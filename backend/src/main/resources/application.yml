@@ -12,6 +12,6 @@ app:
     momo:
       partner-code: MOMOBKUN20180529
       access-key: klm05nu13s1puph7
-      secret-key: at槍9982345
+      secret-key: atQs0nSXYs9iw9Z8792mUn7VS7yVmiF4
       endpoint: https://test-payment.momo.vn/v2/gateway/api/create
       return-url: http://localhost:5173/payment-result

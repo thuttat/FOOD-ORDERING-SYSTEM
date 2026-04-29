@@ -1,15 +1,14 @@
 package duckie.example.backend.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import duckie.example.backend.dto.ReviewRequest;
 import duckie.example.backend.dto.ReviewResponse;
-import duckie.example.backend.entity.User;
 import duckie.example.backend.service.ReviewService;
 import jakarta.validation.Valid;
 
@@ -21,11 +20,13 @@ public class ReviewController {
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
+
     @PostMapping("/reviews")
     public ResponseEntity<ReviewResponse> createReview(
             @Valid @RequestBody ReviewRequest request,
-            @AuthenticationPrincipal User currentUser) {
-        ReviewResponse response = reviewService.createReview(request, currentUser);
+            Principal principal) {
+
+        ReviewResponse response = reviewService.createReview(request, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

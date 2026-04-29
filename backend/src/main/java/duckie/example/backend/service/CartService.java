@@ -1,7 +1,6 @@
 package duckie.example.backend.service;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +36,6 @@ public class CartService {
 
     @Transactional(readOnly = true)
     public CartResponse getCart(String username) {
-        // Tìm User từ Database dựa vào username
         User customer = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", username));
 
@@ -59,7 +57,7 @@ public class CartService {
         );
 
         MenuItem menuItem = menuItemRepository.findById(request.menuItemId())
-                .orElseThrow(() -> new RuntimeException("Thís dish does not exist!"));
+                .orElseThrow(() -> new RuntimeException("This dish does not exist!"));
 
         CartItem cartItem = cartItemRepository.findByCartIdAndMenuItemId(cart.getId(), menuItem.getId())
                 .orElse(CartItem.builder().cart(cart).menuItem(menuItem).quantity(0).build());
@@ -73,7 +71,7 @@ public class CartService {
     @Transactional
     public CartResponse updateCartItem(String username, Long cartItemId, Integer quantity) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Chi tiết giỏ hàng không tồn tại!"));
+                .orElseThrow(() -> new RuntimeException("The detail does not exist!"));
 
         if (quantity <= 0) {
             cartItemRepository.delete(cartItem);
@@ -85,7 +83,17 @@ public class CartService {
     }
 
     @Transactional
-    public void removeCartItem(Long cartItemId) {
+    public CartResponse removeCartItemAndReturnCart(String username, Long cartItemId) {
         cartItemRepository.deleteById(cartItemId);
+        return getCart(username);
+    }
+
+    @Transactional
+    public void clearCart(String username) {
+        User customer = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User", username));
+        Cart cart = cartRepository.findByCustomerId(customer.getId())
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+        cartItemRepository.deleteByCartId(cart.getId());
     }
 }

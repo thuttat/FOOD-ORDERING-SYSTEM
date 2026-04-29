@@ -1,17 +1,9 @@
 import api from "./AxiosClient";
 
 export const PaymentService = {
-    createPayment: (paymentData) => {
-        return api.post("/payments/create", paymentData);
-    },
+    createPayment: (paymentData) => api.post("/payments", paymentData),
 
+    verifyMomo: (params) => api.get("/payments/momo-callback", { params }),
 
-    verifyPayment: (params) => {
-        return api.get("/payments/callback", { params });
-    },
-
-
-    getPaymentHistory: () => {
-        return api.get("/payments/history");
-    }
+    verifyVnpay: (params) => api.get("/payments/vnpay-callback", { params }),
 };

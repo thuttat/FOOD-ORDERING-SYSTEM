@@ -13,12 +13,15 @@ import { Home } from "./pages/customer/Home/Home.jsx";
 import { RestaurantDetail } from "./pages/customer/RestaurantDetails/RestaurantDetail.jsx";
 import { Cart } from "./pages/customer/Cart/Cart.jsx";
 import { PaymentResult } from "./pages/customer/PaymentResult/PaymentResult.jsx";
+import NotificationPage from "./pages/customer/Notification/NotificationPage.jsx";
+import { Profile } from "./pages/customer/Profile/Profile.jsx";
+import OrderDetail from "./pages/customer/OrderDetail/OrderDetail.jsx";
 
 import { AdminDashboard } from "./pages/admin/AdminDashboard/AdminDashboard.jsx";
 import { RestaurantsManagement } from "./pages/admin/RestaurantsManagement/RestaurantsManagement.jsx";
 import { ReviewsManagement } from "./pages/admin/ReviewsManagement/ReviewsManagement.jsx";
 
-import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants.jsx"; 
+import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants.jsx";
 import MenuTable from "./pages/restaurant/components/MenuTable.jsx";
 import RealtimeOrder from "./pages/restaurant/components/RealtimeOrder.jsx";
 
@@ -41,8 +44,12 @@ function App() {
                         <Route path="/restaurant/:id" element={<RestaurantDetail />} />
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/payment-result" element={<PaymentResult />} />
-                    </Route>
+                        <Route path="/notifications" element={<NotificationPage />} />
 
+                        <Route path="/orders" element={<Profile />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/order-detail/:id" element={<OrderDetail />} />
+                    </Route>
                     <Route
                         path="/restaurant/*"
                         element={
@@ -57,7 +64,6 @@ function App() {
                         <Route path="orders" element={<RealtimeOrder />} />
                     </Route>
 
-    
                     <Route
                         path="/admin/*"
                         element={

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,58 +15,65 @@ import org.springframework.web.bind.annotation.RestController;
 
 import duckie.example.backend.dto.RestaurantRequest;
 import duckie.example.backend.dto.RestaurantResponse;
-import duckie.example.backend.service.RestaurantService;
+import duckie.example.backend.service.RestaurantServiceImpl;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
 public class RestaurantController {
 
-    private final RestaurantService restaurantService;
+    private final RestaurantServiceImpl restaurantServiceImpl;
 
-    public RestaurantController(RestaurantService restaurantService) {
-        this.restaurantService = restaurantService;
+    public RestaurantController(RestaurantServiceImpl restaurantServiceImpl) {
+        this.restaurantServiceImpl = restaurantServiceImpl;
     }
 
     @GetMapping("/restaurants")
     public ResponseEntity<List<RestaurantResponse>> findAllActiveRestaurants() {
-        List<RestaurantResponse> restaurants = restaurantService.findAllActive();
+        List<RestaurantResponse> restaurants = restaurantServiceImpl.findAllActive();
         return ResponseEntity.ok(restaurants);
     }
+
+    @GetMapping("/restaurants/{id}")
+    public ResponseEntity<RestaurantResponse> getRestaurantById(@PathVariable Long id) {
+        RestaurantResponse response = restaurantServiceImpl.getRestaurantById(id);
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping("/admin/restaurants")
     public ResponseEntity<List<RestaurantResponse>> getAllRestaurants(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<RestaurantResponse> restaurantResponse = restaurantService.getAllRestaurants(page, size);
+        Page<RestaurantResponse> restaurantResponse = restaurantServiceImpl.getAllRestaurants(page, size);
         return ResponseEntity.ok(restaurantResponse.getContent());
     }
 
     @PostMapping("/admin/restaurants")
     public ResponseEntity<RestaurantResponse> createRestaurantByAdmin(@Valid @RequestBody RestaurantRequest request) {
-        return ResponseEntity.ok(restaurantService.createRestaurant(request, true));
+        return ResponseEntity.ok(restaurantServiceImpl.createRestaurant(request, true));
     }
 
     @GetMapping("/admin/restaurants/pending")
     public ResponseEntity<List<RestaurantResponse>> getPendingRestaurants(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<RestaurantResponse> restaurantResponse = restaurantService.getPendingRestaurants(page, size);
+        Page<RestaurantResponse> restaurantResponse = restaurantServiceImpl.getPendingRestaurants(page, size);
         return ResponseEntity.ok(restaurantResponse.getContent());
     }
 
     @PatchMapping("/admin/restaurants/{id}/approve")
     public ResponseEntity<RestaurantResponse> approveRestaurant(@PathVariable Long id) {
-        return ResponseEntity.ok(restaurantService.approveRestaurant(id));
+        return ResponseEntity.ok(restaurantServiceImpl.approveRestaurant(id));
     }
 
     @PatchMapping("/admin/restaurants/{id}/lock")
     public ResponseEntity<RestaurantResponse> lockRestaurant(@PathVariable Long id) {
-        return ResponseEntity.ok(restaurantService.lockRestaurant(id));
+        return ResponseEntity.ok(restaurantServiceImpl.lockRestaurant(id));
     }
 
     @PatchMapping("/admin/restaurants/{id}/reinstate")
     public ResponseEntity<RestaurantResponse> reinstateRestaurant(@PathVariable Long id) {
-        return ResponseEntity.ok(restaurantService.reinstateRestaurant(id));
+        return ResponseEntity.ok(restaurantServiceImpl.reinstateRestaurant(id));
     }
 }

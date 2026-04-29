@@ -11,7 +11,7 @@ export function RestaurantDetail() {
     const [menuGroups, setMenuGroups] = useState({});
 
     useEffect(() => {
-        axiosClient.get(`/api/restaurants/${id}`)
+        axiosClient.get(`/restaurants/${id}`)
             .then(res => {
                 setRestaurant(res.data);
                 const groups = res.data.menuItems.reduce((acc, item) => {
@@ -28,9 +28,11 @@ export function RestaurantDetail() {
     const handleAddToCart = async (menuItemId) => {
         try {
             await CartService.addToCart(menuItemId, 1);
-            alert("Successfully adding!");
+            window.dispatchEvent(new Event('cartUpdated'));
+
+            alert("Successfully!");
         } catch (error) {
-            console.error(error);
+            console.error("Add to cart error:", error);
             alert("Cannot add to cart.");
         }
     };
@@ -53,10 +55,10 @@ export function RestaurantDetail() {
 
             <div className="menu-container">
                 {Object.keys(menuGroups).map(catName => (
-                    <MenuCategory 
-                        key={catName} 
-                        title={catName} 
-                        items={menuGroups[catName]} 
+                    <MenuCategory
+                        key={catName}
+                        title={catName}
+                        items={menuGroups[catName]}
                         onAdd={handleAddToCart}
                     />
                 ))}

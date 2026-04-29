@@ -8,7 +8,7 @@ export function Home() {
     const [restaurants, setRestaurants] = useState([]);
 
     useEffect(() => {
-        axiosClient.get("/api/restaurants")
+        axiosClient.get("restaurants")
             .then(res => setRestaurants(res.data))
             .catch(err => console.error(err));
     }, []);

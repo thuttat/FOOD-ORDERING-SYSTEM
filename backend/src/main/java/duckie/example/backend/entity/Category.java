@@ -1,7 +1,9 @@
 package duckie.example.backend.entity;
 
 import java.time.Instant;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,11 +13,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "categories", indexes = {
-    @Index(name = "idx_category_restaurant", columnList = "restaurant_id")
+        @Index(name = "idx_category_restaurant", columnList = "restaurant_id")
 })
 public class Category extends BaseEntity {
 
@@ -30,69 +33,37 @@ public class Category extends BaseEntity {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<MenuItem> menuItems;
+
     public Category() {}
 
-    public Long getId() { 
-        return id; 
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) { 
-        this.id = id; 
-    }
+    public Restaurant getRestaurant() { return restaurant; }
+    public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
 
-    public Restaurant getRestaurant() { 
-        return restaurant; 
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setRestaurant(Restaurant restaurant) { 
-        this.restaurant = restaurant; 
-    }
+    public List<MenuItem> getMenuItems() { return menuItems; }
+    public void setMenuItems(List<MenuItem> menuItems) { this.menuItems = menuItems; }
 
-    public String getName() { 
-        return name; 
-    }
-
-    public void setName(String name) { 
-        this.name = name; 
-    }
-
-    public static CategoryBuilder builder() { 
-        return new CategoryBuilder(); 
-    }
+    public static CategoryBuilder builder() { return new CategoryBuilder(); }
 
     public static final class CategoryBuilder {
         private Long id;
-        
-        private duckie.example.backend.entity.Restaurant restaurant; 
-        
+        private duckie.example.backend.entity.Restaurant restaurant;
         private String name;
         private Instant createdAt;
         private Instant updatedAt;
 
-        public CategoryBuilder id(Long id) { 
-            this.id = id; 
-            return this; 
-        }
-
-        public CategoryBuilder restaurant(duckie.example.backend.entity.Restaurant restaurant) { 
-            this.restaurant = restaurant; 
-            return this; 
-        }
-
-        public CategoryBuilder name(String name) { 
-            this.name = name; 
-            return this; 
-        }
-
-        public CategoryBuilder createdAt(Instant createdAt) { 
-            this.createdAt = createdAt; 
-            return this; 
-        }
-
-        public CategoryBuilder updatedAt(Instant updatedAt) { 
-            this.updatedAt = updatedAt; 
-            return this; 
-        }
+        public CategoryBuilder id(Long id) { this.id = id; return this; }
+        public CategoryBuilder restaurant(duckie.example.backend.entity.Restaurant restaurant) { this.restaurant = restaurant; return this; }
+        public CategoryBuilder name(String name) { this.name = name; return this; }
+        public CategoryBuilder createdAt(Instant createdAt) { this.createdAt = createdAt; return this; }
+        public CategoryBuilder updatedAt(Instant updatedAt) { this.updatedAt = updatedAt; return this; }
 
         public Category build() {
             Category category = new Category();
