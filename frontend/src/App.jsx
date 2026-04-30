@@ -20,12 +20,12 @@ import OrderDetail from "./pages/customer/OrderDetail/OrderDetail.jsx";
 import { AdminDashboard } from "./pages/admin/AdminDashboard/AdminDashboard.jsx";
 import { RestaurantsManagement } from "./pages/admin/RestaurantsManagement/RestaurantsManagement.jsx";
 import { ReviewsManagement } from "./pages/admin/ReviewsManagement/ReviewsManagement.jsx";
+import { UsersManagement } from "./pages/admin/UsersManagement/UsersManagement.jsx";
+import { AdminOrders } from "./pages/admin/AdminOrders/AdminOrders.jsx";
 
 import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants.jsx";
 import MenuTable from "./pages/restaurant/components/MenuTable.jsx";
 import RealtimeOrder from "./pages/restaurant/components/RealtimeOrder.jsx";
-import {UsersManagement} from "./pages/admin/UsersManagement/UsersManagement.jsx";
-import {AdminOrders} from "./pages/admin/AdminOrders/AdminOrders.jsx";
 
 function App() {
     return (
@@ -34,6 +34,7 @@ function App() {
                 <Routes>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+
 
                     <Route
                         element={
@@ -47,11 +48,12 @@ function App() {
                         <Route path="/cart" element={<Cart />} />
                         <Route path="/payment-result" element={<PaymentResult />} />
                         <Route path="/notifications" element={<NotificationPage />} />
-
                         <Route path="/orders" element={<Profile />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/order-detail/:id" element={<OrderDetail />} />
                     </Route>
+
+
                     <Route
                         path="/restaurant/*"
                         element={
@@ -65,6 +67,7 @@ function App() {
                         <Route path="menu" element={<MenuTable />} />
                         <Route path="orders" element={<RealtimeOrder />} />
                     </Route>
+
 
                     <Route
                         path="/admin/*"

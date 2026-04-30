@@ -38,7 +38,7 @@
 |------------|-------------------|
 | **Trịnh Thị Anh Thư** | Khởi tạo project ReactJS. Dựng giao diện UI luồng Khách hàng: Trang chủ, Trang chi tiết quán ăn, Giỏ hàng và Checkout. Ghép nối API và xử lý lỗi CORS. |
 | **Lê Hoàng Bảo Trân** | Dựng giao diện UI luồng Admin: Dashboard thống kê, Bảng duyệt nhà hàng và quản lý đánh giá vi phạm. |
-| **Nguyễn Triệu Duy** | Dựng giao diện UI luồng Nhà hàng: Màn hình quản lý thực đơn, Màn hình nhận đơn hàng Real-time (lắng nghe từ RabbitMQ). |
+| **Nguyễn Triệu Duy** | Dựng giao diện UI luồng Nhà hàng: Màn hình quản lý thực đơn, Màn hình Receive real-time orders (lắng nghe từ RabbitMQ). |
 
 ---
 

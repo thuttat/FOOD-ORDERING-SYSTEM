@@ -1,8 +1,8 @@
 app:
   jwt:
     secret: "iw3uetgdrouq36ye8723teuwdakfyyudhetr73yut933ryruhgfjg"
-    access-token-expires-ms: 3600000 
-    refresh-token-expires-ms: 604800000 
+    access-token-expires-ms: 3600000
+    refresh-token-expires-ms: 604800000
   payment:
     vnpay:
       tmn-code: 2QX7C5XJ
