@@ -55,7 +55,7 @@ export function Login() {
                 }
             }
         } catch (error) {
-            console.error("Lỗi đăng nhập:", error);
+            console.error("Error:", error);
             alert("Login failed. Please check your credentials and try again.");
         }
     };

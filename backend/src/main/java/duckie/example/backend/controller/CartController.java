@@ -1,5 +1,8 @@
 package duckie.example.backend.controller;
 
+import java.security.Principal;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,7 +12,6 @@ import duckie.example.backend.dto.CartItemRequest;
 import duckie.example.backend.dto.CartResponse;
 import duckie.example.backend.service.CartService;
 import jakarta.validation.Valid;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -26,10 +28,11 @@ public class CartController {
     }
 
     @PostMapping("/items")
-    public ResponseEntity<CartResponse> addItem(
+    public ResponseEntity<?> addItem(
             @Valid @RequestBody CartItemRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(cartService.addItemToCart(userDetails.getUsername(), request));
+            Principal principal) {
+
+        return ResponseEntity.ok(cartService.addItemToCart(principal.getName(), request));
     }
 
     @PutMapping("/items/{cartItemId}")

@@ -1,11 +1,12 @@
 package duckie.example.backend.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -43,9 +44,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         .requestMatchers("/public/**").permitAll()
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/api/auth/me").authenticated()
@@ -53,11 +56,21 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu-items/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/restaurants/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/menu-items/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/menu-items/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/restaurants/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/api/menu/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/menu/**").hasAnyRole("RESTAURANT")
+                        .requestMatchers(HttpMethod.PUT, "/api/menu/**").hasAnyRole("RESTAURANT")
+                        .requestMatchers(HttpMethod.DELETE, "/api/menu/**").hasAnyRole("RESTAURANT")
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasAnyRole("RESTAURANT")
+                        .requestMatchers(HttpMethod.GET, "/api/restaurants/analytics").hasAnyRole("RESTAURANT")
+                        .requestMatchers("/ws/**").permitAll() // Mở cổng cho WebSockets (RabbitMQ)
+
                         .requestMatchers("/api/payments/vnpay-callback", "/api/payments/momo-callback").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -74,7 +87,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
+
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "x-auth-token"));
         configuration.setAllowCredentials(true);

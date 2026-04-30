@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: duckie-rabbitmq-v2
+    ports:
+      - "5673:5672"   
+      - "15673:15672" 
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  backend:
+    build: ./backend
+    container_name: duckie-backend
+    depends_on:
+      - rabbitmq
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:/data/duckie_food_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_SQL_INIT_MODE=never
+      - SPRING_SQL_INIT_DATA_LOCATIONS=classpath:data.sql
+      - SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION=true
+    volumes:
+      - duckie_h2_data:/data
+    ports:
+      - "8081:8081"
+
+  frontend:
+    build: ./frontend
+    container_name: duckie-frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
+
+volumes:
+  duckie_h2_data:

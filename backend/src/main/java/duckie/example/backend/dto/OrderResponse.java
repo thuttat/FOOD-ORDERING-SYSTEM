@@ -5,30 +5,19 @@ import java.time.Instant;
 import java.util.List;
 
 public record OrderResponse(
-    Long id,
-
-    Long customerId,
-
-    String customerName,
-
-    String customerEmail,
-
-    Long restaurantId,
-
-    String restaurantName,
-
-    BigDecimal totalAmount,
-
-    BigDecimal deliveryFee,
-
-    String status,
-
-    String deliveryAddress,
-
-    String customerNote,
-
-    List<OrderItemResponse> items,
-
-    Instant createdAt
+        Long id,
+        Long customerId,
+        String customerName,
+        String customerEmail,
+        String customerPhone,
+        Long restaurantId,
+        String restaurantName,
+        BigDecimal totalAmount,
+        BigDecimal deliveryFee,
+        String status,
+        String deliveryAddress,
+        String customerNote,
+        List<OrderItemResponse> items,
+        Instant createdAt
 ) {
 }

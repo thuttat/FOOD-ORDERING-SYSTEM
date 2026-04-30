@@ -26,16 +26,19 @@ import { AdminOrders } from "./pages/admin/AdminOrders/AdminOrders.jsx";
 import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants.jsx";
 import MenuTable from "./pages/restaurant/components/MenuTable.jsx";
 import RealtimeOrder from "./pages/restaurant/components/RealtimeOrder.jsx";
+import OrderHistory from "./pages/restaurant/OrderHistory.jsx";
+import Analytics from "./pages/restaurant/Analytics.jsx";
 
 function App() {
     return (
         <AuthProvider>
             <BrowserRouter>
                 <Routes>
+                    {/* Public Routes */}
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
 
-
+                    {/* Customer Routes (USER) */}
                     <Route
                         element={
                             <PrivateRoute allowedRoles={["USER"]}>
@@ -53,7 +56,6 @@ function App() {
                         <Route path="/order-detail/:id" element={<OrderDetail />} />
                     </Route>
 
-
                     <Route
                         path="/restaurant/*"
                         element={
@@ -66,8 +68,9 @@ function App() {
                         <Route path="dashboard" element={<DashboardRestaurants />} />
                         <Route path="menu" element={<MenuTable />} />
                         <Route path="orders" element={<RealtimeOrder />} />
+                        <Route path="history" element={<OrderHistory />} />
+                        <Route path="analytics" element={<Analytics />} />
                     </Route>
-
 
                     <Route
                         path="/admin/*"
@@ -85,6 +88,7 @@ function App() {
                         <Route path="orders" element={<AdminOrders />} />
                     </Route>
 
+                    {/* Fallback */}
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </BrowserRouter>

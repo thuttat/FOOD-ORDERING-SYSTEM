@@ -1,14 +1,15 @@
 package duckie.example.backend.controller;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails; // Bổ sung import này
 import org.springframework.web.bind.annotation.*;
+
 import duckie.example.backend.dto.OrderRequest;
 import duckie.example.backend.dto.OrderResponse;
 import duckie.example.backend.entity.OrderStatus;
@@ -25,23 +26,29 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<List<OrderResponse>> getActiveOrders(Principal principal) {
+        List<OrderResponse> activeOrders = orderService.getActiveOrders(principal.getName());
+        return ResponseEntity.ok(activeOrders);
+    }
+
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
             @Valid @RequestBody OrderRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-
-        OrderResponse response = orderService.createOrder(userDetails.getUsername(), request);
-        return ResponseEntity.ok(response);
+            Principal principal) {
+        // Dùng Principal và HttpStatus.CREATED theo nhánh Duy
+        OrderResponse response = orderService.createOrder(principal.getName(), request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<OrderResponse> updateStatus(
             @PathVariable Long orderId,
             @RequestParam OrderStatus status) {
-
         OrderResponse updatedOrder = orderService.updateOrderStatus(orderId, status);
         return ResponseEntity.ok(updatedOrder);
     }
+
 
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
@@ -61,15 +68,14 @@ public class OrderController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<OrderResponse>> getMyOrders(
-            @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(orderService.getMyOrderHistory(userDetails.getUsername()));
+    public ResponseEntity<List<OrderResponse>> getMyOrders(Principal principal) {
+        return ResponseEntity.ok(orderService.getMyOrderHistory(principal.getName()));
     }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getOrderDetails(
             @PathVariable Long orderId,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(orderService.getOrderDetail(orderId, userDetails.getUsername()));
+            Principal principal) {
+        return ResponseEntity.ok(orderService.getOrderDetail(orderId, principal.getName()));
     }
 }
