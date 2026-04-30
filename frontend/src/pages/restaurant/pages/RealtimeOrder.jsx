@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Volume2, VolumeX, AlertCircle } from 'lucide-react';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import api from '../../../api/AxiosClient'; 
+import axiosClient from '../../../apis/AxiosClient'; 
 import ConnectionStatus from '../components/shared/ConnectionStatus';
 import OrderCard from '../components/orders/OrderCard';
 
@@ -15,7 +15,7 @@ export default function RealtimeOrders() {
 
   const fetchOrders = async () => {
     try {
-      const response = await api.get("/orders/active");
+      const response = await axiosClient.get("/orders/active");
       setOrders(Array.isArray(response) ? response : response.data || []);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
@@ -60,7 +60,7 @@ export default function RealtimeOrders() {
     }
 
     try {
-      await api.patch(`/orders/${orderId}/status`, null, {
+      await axiosClient.patch(`/orders/${orderId}/status`, null, {
         params: { status: newStatus }
       });
 

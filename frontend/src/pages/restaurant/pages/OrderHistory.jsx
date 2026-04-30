@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../../api/AxiosClient';
+import axiosClient from '../../../apis/AxiosClient';
 import OrderTable from '../../restaurant/components/orders/OrderTable'; 
 
 export default function OrderHistory() {
@@ -9,7 +9,7 @@ export default function OrderHistory() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await api.get("/orders/history");
+        const res = await axiosClient.get("/orders/history");
         setHistory(Array.isArray(res) ? res : res.data || []);
       } catch (err) {
         console.error("Failed to fetch history", err);

@@ -6,7 +6,7 @@ import PeakHoursChart from '../components/analytics/PeakHoursChart';
 import CategoryPieChart from '../components/analytics/CategoryPieChart';
 import TopItemsTable from '../components/analytics/TopItemsTable';
 import { DollarSign, ShoppingBag, Receipt, AlertCircle } from 'lucide-react';
-import api from '../../../api/AxiosClient';
+import axiosClient from '../../../apis/AxiosClient';
 
 export default function AdvancedRestaurantAnalytics() {
     const [dateRange, setDateRange] = useState('Last 7 Days');
@@ -18,7 +18,7 @@ export default function AdvancedRestaurantAnalytics() {
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
-                const res = await api.get('/restaurants/analytics');
+                const res = await axiosClient.get('/restaurants/analytics');
                 setAnalyticsData(res.data || res);
             } catch (error) {
                 console.error("Error loading analytics data:", error);
@@ -32,7 +32,7 @@ export default function AdvancedRestaurantAnalytics() {
 
     const handleExport = async () => {
     try {
-        const response = await api.get('/analytics/export', {
+        const response = await axiosClient.get('/analytics/export', {
             responseType: 'blob', 
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}` 

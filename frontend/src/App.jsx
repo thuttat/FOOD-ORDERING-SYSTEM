@@ -23,11 +23,11 @@ import { ReviewsManagement } from "./pages/admin/ReviewsManagement/ReviewsManage
 import { UsersManagement } from "./pages/admin/UsersManagement/UsersManagement.jsx";
 import { AdminOrders } from "./pages/admin/AdminOrders/AdminOrders.jsx";
 
-import DashboardRestaurants from "./pages/restaurant/DashboardRestaurants.jsx";
-import MenuTable from "./pages/restaurant/components/MenuTable.jsx";
-import RealtimeOrder from "./pages/restaurant/components/RealtimeOrder.jsx";
-import OrderHistory from "./pages/restaurant/OrderHistory.jsx";
-import Analytics from "./pages/restaurant/Analytics.jsx";
+import DashboardRestaurants from "./pages/restaurant/pages/DashboardRestaurants.jsx";
+import MenuTable from "./pages/restaurant/components/menu/MenuTable.jsx";
+import RealtimeOrder from"./pages/restaurant/pages/RealtimeOrder.jsx";
+import OrderHistory from "./pages/restaurant/pages/OrderHistory.jsx";
+import Analytics from "./pages/restaurant/\pages/Analytics.jsx";
 
 function App() {
     return (

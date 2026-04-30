@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
-import api from '../../../api/AxiosClient';
+import axiosClient from '../../../apis/AxiosClient.js';
 import MenuTable from '../components/menu/MenuTable';
 import AddItemModal from '../components/menu/AddItemModal';
 import MenuHeader from '../components/menu/MenuHeader';
@@ -17,7 +17,7 @@ export default function DashboardRestaurants() {
     if (!window.confirm(`Are you sure you want to delete "${item.name}"?`)) return;
 
     try {
-      await api.delete(`/menu-items/${item.id}`);
+      await axiosClient.delete(`/menu-items/${item.id}`);
       alert("Item deleted successfully!");
       setRefreshKey(prev => prev + 1);
     } catch (error) {
@@ -46,12 +46,12 @@ export default function DashboardRestaurants() {
       }
 
       if (editingItem) {
-        await api.put(`/menu-items/${editingItem.id}`, dataForServer, {
+        await axiosClient.put(`/menu-items/${editingItem.id}`, dataForServer, {
           headers: { "Content-Type": "multipart/form-data" }
         });
       } else {
         if (!formData.image) return alert("Please select an image!");
-        await api.post("/menu-items", dataForServer, {
+        await axiosClient.post("/menu-items", dataForServer, {
           headers: { "Content-Type": "multipart/form-data" }
         });
       }
@@ -67,7 +67,7 @@ export default function DashboardRestaurants() {
 
   const handleToggleStatus = async (item) => {
     try {
-      await api.put(`/menu-items/${item.id}/toggle`);
+      await axiosClient.put(`/menu-items/${item.id}/toggle`);
       setRefreshKey(prev => prev + 1);
     } catch (error) {
       alert("Toggle failed!");

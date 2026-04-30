@@ -3,7 +3,7 @@ import Badge from '../shared/Badge';
 import IconButton from '../shared/IconButton'
 import { clsx } from 'clsx';
 import { useState, useEffect } from 'react';
-import api from '../../../../api/AxiosClient';
+import axiosClient from '../../../../apis/AxiosClient.js';
 
 
 export default function MenuTable({ onEdit, onDelete, onToggle }) {
@@ -12,7 +12,7 @@ export default function MenuTable({ onEdit, onDelete, onToggle }) {
 
   const fetchMenuItems = async () => {
     try {
-      const res = await api.get("/menu-items");
+      const res = await axiosClient.get("/menu-items");
       setItems(Array.isArray(res) ? res : res.data || []);
     } catch (error) {
       console.error("Error:", error);

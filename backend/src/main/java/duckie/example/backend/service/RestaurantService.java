@@ -12,30 +12,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// Đảm bảo dùng đúng Jackson 2 cho Spring Boot 3.x
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import duckie.example.backend.config.RabbitMQConfig;
 import duckie.example.backend.dto.RestaurantAnalyticsResponse;
-import duckie.example.backend.dto.RestaurantAnalyticsResponse.CategorySalesData;
 import duckie.example.backend.dto.RestaurantAnalyticsResponse.DailyRevenueData;
-import duckie.example.backend.dto.RestaurantAnalyticsResponse.PeakHourData;
-import duckie.example.backend.dto.RestaurantAnalyticsResponse.TopMenuItemData;
 import duckie.example.backend.dto.RestaurantRequest;
 import duckie.example.backend.dto.RestaurantResponse;
 import duckie.example.backend.entity.Order;
