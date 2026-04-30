@@ -15,7 +15,6 @@ export function TopRestaurantsTable({ data }) {
                             <th>Orders</th>
                             <th>Revenue</th>
                             <th>Rating</th>
-                            <th>Status</th>
                         </tr>
                         </thead>
 
@@ -23,14 +22,9 @@ export function TopRestaurantsTable({ data }) {
                         {data.map((restaurant, index) => (
                             <tr key={index}>
                                 <td>{restaurant.name}</td>
-                                <td>{restaurant.orders}</td>
-                                <td>${restaurant.revenue}</td>
-                                <td>{restaurant.rating}</td>
-                                <td>
-                    <span className="status-badge">
-                      {restaurant.status}
-                    </span>
-                                </td>
+                                <td>{restaurant.orderCount}</td>
+                                <td>{restaurant.revenue.toLocaleString()} ₫</td>
+                                <td>{restaurant.rating.toFixed(1)}</td>
                             </tr>
                         ))}
                         </tbody>

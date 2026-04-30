@@ -9,8 +9,14 @@ public record OrderResponse(
 
     Long customerId,
 
+    String customerName,
+
+    String customerEmail,
+
     Long restaurantId,
+
     String restaurantName,
+
     BigDecimal totalAmount,
 
     BigDecimal deliveryFee,

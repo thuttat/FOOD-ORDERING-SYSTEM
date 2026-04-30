@@ -40,7 +40,6 @@ public class RestaurantController {
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/admin/restaurants")
     public ResponseEntity<List<RestaurantResponse>> getAllRestaurants(
             @RequestParam(defaultValue = "0") int page,

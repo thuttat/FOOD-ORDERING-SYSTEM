@@ -8,7 +8,7 @@ export function StatsSection({ active, pending, locked }) {
             <StatsCard
                 title="Active"
                 value={active}
-                subtext="+12 this month"
+                subtext="Active restaurants"
                 subtextClass="success"
                 icon={<BadgeCheck />}
                 iconClass="primary"
@@ -30,15 +30,6 @@ export function StatsSection({ active, pending, locked }) {
                 subtextClass="destructive"
                 icon={<BadgeX />}
                 iconClass="destructive"
-            />
-
-            <StatsCard
-                title="Approval Rate"
-                value="83%"
-                subtext="Last 30 days"
-                subtextClass="muted"
-                icon={<TrendingUp />}
-                iconClass="success"
             />
         </div>
     );

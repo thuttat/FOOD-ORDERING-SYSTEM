@@ -19,7 +19,6 @@ public class RestaurantMapper {
 
     private final MenuItemMapper menuItemMapper;
 
-    // Tiêm MenuItemMapper vào thông qua Constructor
     public RestaurantMapper(MenuItemMapper menuItemMapper) {
         this.menuItemMapper = menuItemMapper;
     }
@@ -58,6 +57,7 @@ public class RestaurantMapper {
                 restaurant.getOwner().getId(),
                 restaurant.getOwner().getFullname(),
                 restaurant.getName(),
+                restaurant.getOwner().getEmail(),
                 restaurant.getphone(),
                 restaurant.getAddress(),
                 restaurant.getDescription(),

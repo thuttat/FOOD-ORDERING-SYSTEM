@@ -41,3 +41,4 @@
 .warning { color: var(--warning); }
 .destructive { color: var(--destructive); }
 .muted { color: var(--muted-foreground); }
+.blue { color: blue }

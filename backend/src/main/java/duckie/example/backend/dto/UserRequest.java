@@ -25,6 +25,6 @@ public record UserRequest (
         @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
         String password,
 
-        @Deprecated
+//        @Deprecated => a mún xóa dòng này để linh hoạt gán role ở bên frontend được nữa
         Role role
 ){}

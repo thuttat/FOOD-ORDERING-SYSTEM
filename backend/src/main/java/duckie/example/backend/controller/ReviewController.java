@@ -2,9 +2,12 @@ package duckie.example.backend.controller;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import duckie.example.backend.dto.ReviewRequest;
@@ -38,5 +41,27 @@ public class ReviewController {
     @GetMapping("/restaurants/{restaurantId}/average-rating")
     public ResponseEntity<Double> getAverageRating(@PathVariable Long restaurantId) {
         return ResponseEntity.ok(reviewService.getAverageRating(restaurantId));
+    }
+
+    @GetMapping("/admin/reviews")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<ReviewResponse>> getAllReviewsForAdmin(
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(reviewService.getAllReviewsForAdmin(search, page, size));
+    }
+
+    @DeleteMapping("/admin/reviews/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteReview(@PathVariable Long id) {
+        reviewService.deleteReview(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/admin/reviews/stats")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> getReviewStats() {
+        return ResponseEntity.ok(reviewService.getReviewStats());
     }
 }

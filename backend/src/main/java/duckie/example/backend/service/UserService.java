@@ -1,10 +1,16 @@
 package duckie.example.backend.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import duckie.example.backend.dto.UserRequest;
+import duckie.example.backend.entity.Role;
+import duckie.example.backend.exception.DuplicateResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,10 +37,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponse> findAll() {
-        return userRepository.findAll().stream()
-                .map(userMapper::toResponse)
-                .collect(Collectors.toList());
+    public Page<UserResponse> findAll(String search, Role role, UserStatus status, Pageable pageable) {
+        return userRepository.findAllBySearchAndRoleAndStatus(search, role, status, pageable)
+                .map(userMapper::toResponse);
     }
 
     @Transactional(readOnly = true)
@@ -69,7 +74,67 @@ public class UserService {
     }
 
     @Transactional
+    public UserResponse updateRole(Long id, Role newRole) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+        user.setRole(newRole);
+        return userMapper.toResponse(userRepository.save(user));
+    }
+
+    @Transactional
     public void delete(Long id) {
         userRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Object> getUserStats() {
+        long total = userRepository.count();
+        long activeCustomers = userRepository.countByRoleAndStatus(Role.USER, UserStatus.ACTIVE);
+        long activeRestaurants = userRepository.countByRoleAndStatus(Role.RESTAURANT, UserStatus.ACTIVE);
+
+        List<Object[]> rawData = userRepository.getRawUserRegistrationData();
+        List<Map<String, Object>> growthData = new java.util.ArrayList<>();
+        String[] monthNames = {"", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+        for (int i = 1; i <= 12; i++) {
+            Map<String, Object> mData = new java.util.HashMap<>();
+            mData.put("month", monthNames[i]);
+            mData.put("users", 0L);
+            growthData.add(mData);
+        }
+
+        for (Object[] row : rawData) {
+            int monthIndex = Integer.parseInt(row[0].toString());
+            growthData.get(monthIndex - 1).put("users", Long.parseLong(row[1].toString()));
+        }
+
+        return Map.of(
+                "total", total,
+                "activeCustomers", activeCustomers,
+                "activeRestaurants", activeRestaurants,
+                "growthData", growthData
+        );
+    }
+
+    @Transactional
+    public UserResponse createUserByAdmin(UserRequest  request) {
+        if (userRepository.existsByUsername(request.username())) {
+            throw new DuplicateResourceException("Username already exists: " + request.username());
+        }
+        if (userRepository.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("Email already exists: " + request.email());
+        }
+        Role assignedRole = request.role() != null ? request.role() : Role.USER;
+
+        User user = User.builder()
+                .fullname(request.fullname())
+                .username(request.username())
+                .email(request.email())
+                .phone(request.phone())
+                .password(passwordEncoder.encode("123456"))
+                .role(assignedRole)
+                .status(UserStatus.ACTIVE)
+                .build();
+        return userMapper.toResponse(userRepository.save(user));
     }
 }

@@ -6,29 +6,27 @@ import { RestaurantService } from "../../../apis/RestaurantService.js";
 import './RestaurantsManagement.css';
 
 import { ActiveRestaurants } from './components/ActiveRestaurants.jsx';
-import { PendingTable } from './components/PendingTable.jsx';
 import { SuspendedTable } from './components/SuspendedTable.jsx';
 import { DetailPanel } from './components/DetailPanel.jsx';
-import { RejectModal } from './components/RejectModal.jsx';
-import { ApprovalChart } from './components/ApprovalChart.jsx';
 import {StatsSection} from "./components/StatsSection.jsx";
-
-const analyticsData = [
-    { month: 'Jan', approved: 8, rejected: 2 },
-    { month: 'Feb', approved: 12, rejected: 1 },
-    { month: 'Mar', approved: 10, rejected: 3 },
-    { month: 'Apr', approved: 5, rejected: 1 },
-];
+import {Pagination} from "../../../components/common/Pagination.jsx";
+import UserService from "../../../apis/UserService.js";
+import CreateRestaurantModal from "./components/CreateRestaurantModal.jsx";
 
 export function RestaurantsManagement() {
     const [activeTab, setActiveTab] = useState('active');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-    const [selectedForApproval, setSelectedForApproval] = useState(new Set());
-    const [rejectModalOpen, setRejectModalOpen] = useState(false);
     const [restaurants, setRestaurants] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [rejectingId, setRejectingId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const ITEMS_PER_PAGE = 10;
+    const [potentialOwners, setPotentialOwners] = useState([]);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    useEffect(() => {
+        setCurrentPage(0);
+    }, [activeTab, searchQuery]);
 
     const fetchRestaurants = async () => {
         try {
@@ -44,9 +42,36 @@ export function RestaurantsManagement() {
         }
     };
 
+    const fetchPotentialOwners = async () => {
+        try {
+            const response = await UserService.getAllUsers({ role: 'RESTAURANT', size: 1000 });
+            const data = response.data || response;
+            const ownerOptions = (data.content || []).map(u => ({
+                value: u.id,
+                label: `${u.fullname} (@${u.username})`
+            }));
+            setPotentialOwners(ownerOptions);
+        } catch (error) {
+            console.error("Failed to fetch potential owners", error);
+        }
+    };
+
     useEffect(() => {
         fetchRestaurants();
+        fetchPotentialOwners();
     }, []);
+
+    const handleCreateRestaurant = async (formData) => {
+        try {
+            await RestaurantService.createRestaurant({ ...formData, isOpen: true });
+            alert("Restaurant created successfully! Automatically activated.");
+            setIsCreateModalOpen(false);
+            fetchRestaurants();
+        } catch (error) {
+            console.error("Error creating restaurant", error);
+            alert("Error: Please double-check that the Owner is correct.");
+        }
+    };
 
     const filteredRestaurants = restaurants.filter(restaurant => {
         if (!searchQuery.trim()) return true;
@@ -54,27 +79,20 @@ export function RestaurantsManagement() {
         return (
             (restaurant.name && restaurant.name.toLowerCase().includes(query)) ||
             (restaurant.ownerName && restaurant.ownerName.toLowerCase().includes(query)) ||
-            (restaurant.phoneNumber && restaurant.phoneNumber.toLowerCase().includes(query)) ||
-            (restaurant.address && restaurant.address.toLowerCase().includes(query)) ||
-            (restaurant.description && restaurant.description.toLowerCase().includes(query))
+            (restaurant.phoneNumber && restaurant.phoneNumber.toLowerCase().includes(query))
         );
     });
 
     const activeRestaurants = filteredRestaurants.filter(r => r.status === "ACTIVE");
-    const pendingRestaurants = filteredRestaurants.filter(r => r.status === "PENDING");
     const lockedRestaurants = filteredRestaurants.filter(r => r.status === "LOCKED");
 
-    const handleApprove = async (id) => {
-        try {
-            await RestaurantService.approveRestaurant(id);
-            alert("Approved restaurant successfully!");
-            setSelectedRestaurant(null);
-            fetchRestaurants();
-        } catch (error) {
-            console.error("Failed to approve restaurant", error);
-            alert("Cannot approve restaurant. Please try again!");
-        }
-    };
+    let currentTabList = activeTab === 'active' ? activeRestaurants : lockedRestaurants;
+
+    const totalPages = Math.ceil(currentTabList.length / ITEMS_PER_PAGE);
+    const paginatedData = currentTabList.slice(
+        currentPage * ITEMS_PER_PAGE,
+        (currentPage + 1) * ITEMS_PER_PAGE
+    );
 
     const handleLock = async (id) => {
         if (!window.confirm("Are you sure you want to suspend this restaurant?")) return;
@@ -86,54 +104,6 @@ export function RestaurantsManagement() {
         } catch (error) {
             console.error("Failed to suspend restaurant", error);
             alert("Cannot suspend restaurant. Please try again!");
-        }
-    };
-
-    const toggleSelection = (id) => {
-        const newSelection = new Set(selectedForApproval);
-        if (newSelection.has(id)) {
-            newSelection.delete(id);
-        } else {
-            newSelection.add(id);
-        }
-        setSelectedForApproval(newSelection);
-    };
-
-    const handleSelectAll = (e) => {
-        if (e.target.checked) {
-            const allPendingIds = pendingRestaurants.map(r => r.id);
-            setSelectedForApproval(new Set(allPendingIds));
-        } else {
-            setSelectedForApproval(new Set());
-        }
-    };
-
-    const isAllSelected = pendingRestaurants.length > 0 && selectedForApproval.size === pendingRestaurants.length;
-
-    const handleBulkApprove = async () => {
-        try {
-            const promises = Array.from(selectedForApproval).map(id => RestaurantService.approveRestaurant(id));
-            await Promise.all(promises);
-            alert(`Approved ${selectedForApproval.size} restaurants successfully!`);
-            setSelectedForApproval(new Set());
-            fetchRestaurants();
-        } catch (error) {
-            console.error("Failed to bulk approve:", error);
-            alert("Error in bulk approve process. Please try again!");
-        }
-    };
-
-    const handleReject = async () => {
-        if (!rejectingId) return;
-        try {
-            await RestaurantService.lockRestaurant(rejectingId);
-            alert("Rejected restaurant successfully!");
-            setRejectModalOpen(false);
-            setRejectingId(null);
-            fetchRestaurants();
-        } catch (error) {
-            console.error("Failed to reject restaurant", error);
-            alert("Cannot reject restaurant. Please try again!");
         }
     };
 
@@ -155,48 +125,33 @@ export function RestaurantsManagement() {
         return new Date(date).toLocaleDateString('vi-VN');
     };
 
-    const openRejectModal = (id) => {
-        setRejectingId(id);
-        setRejectModalOpen(true);
-        setSelectedRestaurant(null);
-    };
-
     return (
         <div className="container">
             <div className="admin-restaurants-container">
-                <div className="header-section">
+                <div className="header-section" style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div>
                         <h1>Restaurant Management</h1>
                         <p className="header-subtitle">Monitor and manage all restaurants on the platform</p>
                     </div>
-                    {activeTab === 'pending' && selectedForApproval.size > 0 && (
-                        <Button onClick={handleBulkApprove}>
-                            Approve Selected ({selectedForApproval.size})
-                        </Button>
-                    )}
+                    <Button className="btn-primary" onClick={() => setIsCreateModalOpen(true)}>
+                        + Create new restaurant
+                    </Button>
                 </div>
 
                 <StatsSection
                     active={activeRestaurants.length}
-                    pending={pendingRestaurants.length}
                     locked={lockedRestaurants.length}
+                    pending={0} rate={100}
                 />
 
                 <div className="tabs-wrapper">
                     <div className="tabs-list">
-                        {[
-                            { id: 'active', label: 'Active Restaurants', count: activeRestaurants.length },
-                            { id: 'pending', label: 'Pending Approval', count: pendingRestaurants.length },
-                            { id: 'suspended', label: 'Suspended', count: lockedRestaurants.length },
-                        ].map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-                            >
-                                {tab.label} <span className="tab-count">({tab.count})</span>
-                            </button>
-                        ))}
+                        <button onClick={() => setActiveTab('active')} className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}>
+                            Active <span className="tab-count">({activeRestaurants.length})</span>
+                        </button>
+                        <button onClick={() => setActiveTab('suspended')} className={`tab-btn ${activeTab === 'suspended' ? 'active' : ''}`}>
+                            Suspended <span className="tab-count">({lockedRestaurants.length})</span>
+                        </button>
                     </div>
                 </div>
 
@@ -214,34 +169,30 @@ export function RestaurantsManagement() {
                 ) : (
                     <>
                         {activeTab === 'active' && (
-                            <ActiveRestaurants
-                                restaurants={activeRestaurants}
-                                onSelect={setSelectedRestaurant}
-                                onSuspend={handleLock}
-                            />
-                        )}
-
-                        {activeTab === 'pending' && (
-                            <PendingTable
-                                restaurants={pendingRestaurants}
-                                selectedForApproval={selectedForApproval}
-                                isAllSelected={isAllSelected}
-                                onToggleSelection={toggleSelection}
-                                onSelectAll={handleSelectAll}
-                                onSelect={setSelectedRestaurant}
-                                onApprove={handleApprove}
-                                onRejectClick={openRejectModal}
-                                formatDate={formatDate}
-                            />
+                            <>
+                                <ActiveRestaurants
+                                    restaurants={paginatedData}
+                                    onSelect={setSelectedRestaurant}
+                                    onSuspend={handleLock}
+                                />
+                                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                                    <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
+                                </div>
+                            </>
                         )}
 
                         {activeTab === 'suspended' && (
-                            <SuspendedTable
-                                restaurants={lockedRestaurants}
-                                onSelect={setSelectedRestaurant}
-                                onReinstate={handleReinstate}
-                                formatDate={formatDate}
-                            />
+                            <>
+                                <SuspendedTable
+                                    restaurants={paginatedData}
+                                    onSelect={setSelectedRestaurant}
+                                    onReinstate={handleReinstate}
+                                    formatDate={formatDate}
+                                />
+                                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+                                    <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
+                                </div>
+                            </>
                         )}
                     </>
                 )}
@@ -251,26 +202,17 @@ export function RestaurantsManagement() {
                         restaurant={selectedRestaurant}
                         activeTab={activeTab}
                         onClose={() => setSelectedRestaurant(null)}
-                        onApprove={handleApprove}
-                        onRejectClick={openRejectModal}
                         onSuspend={handleLock}
                         onReinstate={handleReinstate}
                     />
                 )}
 
-                {rejectModalOpen && (
-                    <RejectModal
-                        onClose={() => {
-                            setRejectModalOpen(false);
-                            setRejectingId(null);
-                        }}
-                        onConfirm={handleReject}
-                    />
-                )}
-
-                {activeTab === 'pending' && (
-                    <ApprovalChart data={analyticsData} />
-                )}
+                <CreateRestaurantModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    handleCreate={handleCreateRestaurant}
+                    owners={potentialOwners}
+                />
             </div>
         </div>
     );
