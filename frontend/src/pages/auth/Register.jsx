@@ -1,7 +1,7 @@
 import {Button} from "../../components/common/Button.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
+import axiosClient from "../../apis/AxiosClient.js";
 import {ChevronLeftIcon} from "lucide-react";
 
 export function Register() {
@@ -27,7 +27,7 @@ export function Register() {
         e.preventDefault();
 
         if (formData.password !== formData.confirm) {
-            alert("Mật khẩu xác nhận không khớp! Vui lòng kiểm tra lại.");
+            alert("Pls check your confirm password.");
             return;
         }
 
@@ -40,14 +40,14 @@ export function Register() {
                 role: formData.role,
             };
 
-            const response = await axios.post("http://localhost:8080/api/auth/register", payloadToSend);
+            const response = await axiosClient.post("/auth/register", payloadToSend);
 
             if (response.status === 201 || response.status === 200) {
                 alert("Registration successful! Please log in.");
                 navigate("/login");
             }
         } catch (error) {
-            console.error("Lỗi từ backend:", error.response?.data);
+            console.error("Error:", error.response?.data);
             alert(error.response?.data?.message || "Registration failed. Please try again.");
         }
     };

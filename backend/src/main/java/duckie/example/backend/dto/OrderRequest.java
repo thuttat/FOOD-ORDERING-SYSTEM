@@ -4,12 +4,15 @@ import duckie.example.backend.entity.PaymentMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-
 public record OrderRequest(
-    @NotNull(message = "Pls fill your restaurant id")
-    Long restaurantId,
-    @NotBlank(message = "Pls fill your address")
-    String deliveryAddress,
+        @NotNull(message = "Pls fill your restaurant id")
+        Long restaurantId,
 
-    String customerNote
+        @NotBlank(message = "Pls fill your address")
+        String deliveryAddress,
+
+        String customerNote,
+
+        @NotNull(message = "Payment method can not be blank")
+        PaymentMethod paymentMethod
 ) {}

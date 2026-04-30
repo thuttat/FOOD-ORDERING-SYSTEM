@@ -3,6 +3,7 @@ package duckie.example.backend.dto;
 import java.math.BigDecimal;
 import java.util.List;
 
+
 public record DashboardStatsResponse(
         long totalActiveUsers,
         long totalActiveRestaurants,
@@ -12,4 +13,3 @@ public record DashboardStatsResponse(
         List<StatusChartData> orderStatusChart,
         List<TopRestaurantResponse> topRestaurants
 ) {}
-

@@ -4,6 +4,10 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,9 +25,9 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue orderNotificationQueue() {
-        return new Queue(QUEUE_ORDER_NOTIFICATION, true); 
+        return new Queue(QUEUE_ORDER_NOTIFICATION, true);
     }
-   
+
     @Bean
     public DirectExchange orderExchange() {
         return new DirectExchange(EXCHANGE_ORDER);
@@ -34,15 +38,42 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(orderNotificationQueue).to(orderExchange).with(ROUTING_KEY_ORDER);
     }
 
-    @Bean public DirectExchange appExchange() { return new DirectExchange(EXCHANGE_APP); }
 
-    @Bean public Queue adminNotificationQueue() { return new Queue(QUEUE_ADMIN_NOTIFICATION, true); }
-    @Bean public Queue emailQueue() { return new Queue(QUEUE_EMAIL, true); }
+    @Bean
+    public DirectExchange appExchange() {
+        return new DirectExchange(EXCHANGE_APP);
+    }
 
-    @Bean public Binding bindingAdminNotification() {
+    @Bean
+    public Queue adminNotificationQueue() {
+        return new Queue(QUEUE_ADMIN_NOTIFICATION, true);
+    }
+
+    @Bean
+    public Queue emailQueue() {
+        return new Queue(QUEUE_EMAIL, true);
+    }
+
+    @Bean
+    public Binding bindingAdminNotification() {
         return BindingBuilder.bind(adminNotificationQueue()).to(appExchange()).with(ROUTING_KEY_ADMIN);
     }
-    @Bean public Binding bindingEmail() {
+
+    @Bean
+    public Binding bindingEmail() {
         return BindingBuilder.bind(emailQueue()).to(appExchange()).with(ROUTING_KEY_EMAIL);
+    }
+
+
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new JacksonJsonMessageConverter();
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(jsonMessageConverter());
+        return rabbitTemplate;
     }
 }

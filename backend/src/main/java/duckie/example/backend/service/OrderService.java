@@ -8,13 +8,12 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import duckie.example.backend.dto.StatusChartData;
-import duckie.example.backend.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -28,9 +27,18 @@ import org.springframework.transaction.annotation.Transactional;
 import duckie.example.backend.config.RabbitMQConfig;
 import duckie.example.backend.dto.OrderRequest;
 import duckie.example.backend.dto.OrderResponse;
+import duckie.example.backend.dto.PaymentRequest;
+import duckie.example.backend.dto.StatusChartData;
 import duckie.example.backend.entity.*;
 import duckie.example.backend.mapper.OrderItemMapper;
 import duckie.example.backend.mapper.OrderMapper;
+import duckie.example.backend.mapper.PaymentMapper;
+import duckie.example.backend.repository.CartItemRepository;
+import duckie.example.backend.repository.CartRepository;
+import duckie.example.backend.repository.OrderRepository;
+import duckie.example.backend.repository.PaymentRepository;
+import duckie.example.backend.repository.RestaurantRepository;
+import duckie.example.backend.repository.UserRepository;
 
 @Service
 public class OrderService {
@@ -42,11 +50,15 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final RabbitTemplate rabbitTemplate;
+    private final RestaurantRepository restaurantRepository;
+    private final PaymentMapper paymentMapper;
+
+    private final PaymentRepository paymentRepository;
 
     public OrderService(UserRepository userRepository, OrderRepository orderRepository, CartRepository cartRepository,
-                        CartItemRepository cartItemRepository,
-                        OrderMapper orderMapper, OrderItemMapper orderItemMapper,
-                        RabbitTemplate rabbitTemplate) {
+                        CartItemRepository cartItemRepository, OrderMapper orderMapper, OrderItemMapper orderItemMapper,
+                        RabbitTemplate rabbitTemplate, RestaurantRepository restaurantRepository,
+                        PaymentMapper paymentMapper, PaymentRepository paymentRepository) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
@@ -54,12 +66,24 @@ public class OrderService {
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
         this.rabbitTemplate = rabbitTemplate;
+        this.restaurantRepository = restaurantRepository;
+        this.paymentMapper = paymentMapper;
+        this.paymentRepository = paymentRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getOrderHistory() {
+        List<OrderStatus> historyStatuses = List.of(OrderStatus.DELIVERED, OrderStatus.CANCELLED);
+        return orderRepository.findByStatusInOrderByCreatedAtDesc(historyStatuses)
+                .stream()
+                .map(orderMapper::toResponse)
+                .toList();
     }
 
     @Transactional
     public OrderResponse createOrder(String username, OrderRequest request) {
         User customer = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Can not find this user"));
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
         Cart cart = cartRepository.findByCustomerId(customer.getId())
                 .orElseThrow(() -> new RuntimeException("Cart does not exist"));
@@ -83,20 +107,51 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        PaymentMethod method = request.paymentMethod();
+        Payment payment = paymentMapper.toEntity(
+                new PaymentRequest(savedOrder.getId(), method, savedOrder.getTotalAmount()),
+                savedOrder,
+                "TXN_" + System.currentTimeMillis()
+        );
+        paymentRepository.save(payment);
 
-        sendRabbitNotification("Bill created: #" + savedOrder.getId());
+        cartItemRepository.deleteByCartId(cart.getId());
 
-        return orderMapper.toResponse(savedOrder);
+        OrderResponse response = orderMapper.toResponse(savedOrder);
+
+        sendNotification(response);
+
+        return response;
     }
 
-    private void sendRabbitNotification(String message) {
+    @Transactional
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("cannot find bill ID: " + orderId));
+
+        order.setStatus(newStatus);
+        Order savedOrder = orderRepository.save(order);
+
+        OrderResponse response = orderMapper.toResponse(savedOrder);
+
+        sendNotification(response);
+
+        return response;
+    }
+
+    private void sendNotification(Object data) {
         try {
-            rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_ORDER, RabbitMQConfig.ROUTING_KEY_ORDER, message);
-            logger.info("RabbitMQ Notification Success: {}", message);
+            rabbitTemplate.convertAndSend(
+                    RabbitMQConfig.EXCHANGE_ORDER,
+                    RabbitMQConfig.ROUTING_KEY_ORDER,
+                    data
+            );
+            logger.info("RabbitMQ Notification Sent Successfully");
         } catch (Exception e) {
             logger.error("RabbitMQ Notification Failed: {}", e.getMessage());
         }
     }
+
 
     @Transactional(readOnly = true)
     public Page<OrderResponse> getAdminOrders(String search, OrderStatus status, String restaurantName, int page, int size) {
@@ -156,6 +211,7 @@ public class OrderService {
         );
     }
 
+    @Transactional(readOnly = true)
     public List<OrderResponse> getMyOrderHistory(String username) {
         User customerUser = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerUser.getId()).stream().map(orderMapper::toResponse).collect(Collectors.toList());
@@ -169,11 +225,24 @@ public class OrderService {
         return orderMapper.toResponse(order);
     }
 
-    @Transactional
-    public OrderResponse updateOrderStatus(Long orderId, OrderStatus newStatus) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
-        order.setStatus(newStatus);
-        Order savedOrder = orderRepository.save(order);
-        return orderMapper.toResponse(savedOrder);
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getActiveOrders(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow();
+        Restaurant restaurant = restaurantRepository.findByOwnerId(user.getId()).orElseThrow();
+        Long resId = restaurant.getId();
+
+        List<OrderStatus> activeStatuses = Arrays.asList(
+                OrderStatus.PENDING,
+                OrderStatus.CONFIRMED,
+                OrderStatus.PREPARING,
+                OrderStatus.READY,
+                OrderStatus.OUT_FOR_DELIVERY
+        );
+
+        List<Order> activeOrders = orderRepository.findByRestaurantIdAndStatusInOrderByCreatedAtDesc(resId, activeStatuses);
+
+        return activeOrders.stream()
+                .map(orderMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }
