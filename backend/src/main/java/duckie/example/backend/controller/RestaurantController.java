@@ -39,7 +39,6 @@ public class RestaurantController {
         return ResponseEntity.ok(restaurants);
     }
 
-    // Giữ lại API xem chi tiết nhà hàng từ nhánh của bạn (HEAD)
     @GetMapping("/restaurants/{id}")
     public ResponseEntity<RestaurantResponse> getRestaurantById(@PathVariable Long id) {
         RestaurantResponse response = restaurantService.getRestaurantById(id);

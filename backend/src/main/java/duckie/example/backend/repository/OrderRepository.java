@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import duckie.example.backend.dto.StatusChartData;
 import duckie.example.backend.dto.TopRestaurantResponse;
 import duckie.example.backend.entity.Order;
 import duckie.example.backend.entity.OrderStatus;
