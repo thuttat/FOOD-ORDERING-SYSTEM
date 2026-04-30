@@ -6,23 +6,17 @@ import java.util.List;
 
 public record OrderResponse(
     Long id,
-
     Long customerId,
-
+    String customerName, 
+    String customerPhone,  
     Long restaurantId,
-
+    String restaurantName,  
     BigDecimal totalAmount,
-
     BigDecimal deliveryFee,
-
     String status,
-
     String deliveryAddress,
-
     String customerNote,
-
     List<OrderItemResponse> items,
-
     Instant createdAt
 ) {
 }

@@ -15,6 +15,7 @@ import duckie.example.backend.mapper.CartMapper;
 import duckie.example.backend.repository.CartItemRepository;
 import duckie.example.backend.repository.CartRepository;
 import duckie.example.backend.repository.MenuItemRepository;
+import duckie.example.backend.repository.UserRepository;
 
 @Service
 public class CartService {
@@ -22,13 +23,15 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final MenuItemRepository menuItemRepository;
     private final CartMapper cartMapper;
+    private final UserRepository userRepository;
 
     public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository, 
-                       MenuItemRepository menuItemRepository, CartMapper cartMapper) {
+                       MenuItemRepository menuItemRepository, CartMapper cartMapper, UserRepository userRepository) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.menuItemRepository = menuItemRepository;
         this.cartMapper = cartMapper;
+        this.userRepository=userRepository;
     }
 
     @Transactional(readOnly = true)
@@ -42,7 +45,10 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponse addItemToCart(User customer, CartItemRequest request) {
+    public CartResponse addItemToCart(String username, CartItemRequest request) {
+        User customer = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
         Cart cart = cartRepository.findByCustomerId(customer.getId()).orElseGet(() -> 
             cartRepository.save(Cart.builder().customer(customer).build())
         );

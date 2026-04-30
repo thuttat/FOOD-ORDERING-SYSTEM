@@ -1,5 +1,7 @@
 package duckie.example.backend.controller;
 
+import java.security.Principal;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,10 +34,12 @@ public class CartController {
     }
 
     @PostMapping("/items")
-    public ResponseEntity<CartResponse> addItem(
+    public ResponseEntity<?> addItem(
             @Valid @RequestBody CartItemRequest request,
-            @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(cartService.addItemToCart(currentUser, request));
+            Principal principal) {
+        String username = principal.getName();
+        cartService.addItemToCart(username, request); 
+        return ResponseEntity.ok("Add cart successful!");
     }
 
     @PutMapping("/items/{cartItemId}")

@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -45,9 +45,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(Customizer.withDefaults())
+                // .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                        
                         .requestMatchers("/public/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
@@ -57,9 +60,14 @@ public class SecurityConfig {
 
                         
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/menu/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/menu/**").hasAnyRole("RESTAURANT")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/menu/**").hasAnyRole("RESTAURANT")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/menu/**").hasAnyRole("RESTAURANT")
+                        // .requestMatchers("/api/analytics/**").hasAnyRole("RESTAURANT", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasAnyRole("RESTAURANT")
+                        .requestMatchers(HttpMethod.GET, "/api/restaurants/analytics").hasAnyRole("RESTAURANT")
+                        .requestMatchers("/ws/**").permitAll()
+
                         .requestMatchers("/api/payments/vnpay-callback", "/api/payments/momo-callback").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -20,14 +20,12 @@ public class OrderMapper {
 
     private final OrderItemMapper orderItemMapper;
 
-
     public OrderMapper(OrderItemMapper orderItemMapper) {
         this.orderItemMapper = orderItemMapper;
     }
+
     public Order toEntity(OrderRequest request, User customer, Restaurant restaurant) {
-        if (request == null) {
-            return null;
-        }
+        if (request == null) return null;
 
         return Order.builder()
                 .customer(customer)
@@ -41,24 +39,24 @@ public class OrderMapper {
                 .build();
     }
 
-
-
     public OrderResponse toResponse(Order order) {
-        if (order == null) {
-            return null;
-        }
-
-        List<OrderItemResponse> itemDtos = order.getItems().stream()
-            .map(orderItemMapper::toResponse)
-            .collect(Collectors.toList());
+        if (order == null) return null;
+        List<OrderItemResponse> itemDtos = order.getItems() != null 
+            ? order.getItems().stream()
+                .map(orderItemMapper::toResponse)
+                .collect(Collectors.toList())
+            : new ArrayList<>();
 
         return new OrderResponse(
             order.getId(),
-            order.getCustomer().getId(),
-            order.getRestaurant().getId(),
+            order.getCustomer() != null ? order.getCustomer().getId() : null,
+            order.getCustomer() != null ? order.getCustomer().getFullname() : "N/A", 
+            order.getCustomer() != null ? order.getCustomer().getPhone() : "N/A",
+            order.getRestaurant() != null ? order.getRestaurant().getId() : null,
+            order.getRestaurant() != null ? order.getRestaurant().getName() : "N/A",     
             order.getTotalAmount(),
             order.getDeliveryFee(),
-            order.getStatus() != null ? order.getStatus().name() : null,
+            order.getStatus() != null ? order.getStatus().name() : "PENDING",
             order.getDeliveryAddress(),
             order.getCustomerNote(),
             itemDtos,

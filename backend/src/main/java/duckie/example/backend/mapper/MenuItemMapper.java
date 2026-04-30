@@ -25,7 +25,7 @@ public class MenuItemMapper {
         if (item == null) return null;
         return new MenuItemResponse(
                 item.getId(),
-                item.getCategory().getId(),
+                item.getCategory() != null ? item.getCategory().getName() : "Uncategorized",
                 item.getName(),
                 item.getDescription(),
                 item.getPrice(),

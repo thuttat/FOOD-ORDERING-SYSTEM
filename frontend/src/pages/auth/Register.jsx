@@ -1,7 +1,7 @@
 import {Button} from "../../components/common/Button.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
+import api from "../../api/AxiosClient";
 
 export function Register() {
     const [formData, setFormData] = useState({
@@ -39,14 +39,14 @@ export function Register() {
                 role: formData.role,
             };
 
-            const response = await axios.post("http://localhost:8080/api/auth/register", payloadToSend);
+            const response = await api.post("/auth/register", payloadToSend);
 
             if (response.status === 201 || response.status === 200) {
                 alert("Registration successful! Please log in.");
                 navigate("/login");
             }
         } catch (error) {
-            console.error("Lỗi từ backend:", error.response?.data);
+            console.error("Error:", error.response?.data);
             alert(error.response?.data?.message || "Registration failed. Please try again.");
         }
     };

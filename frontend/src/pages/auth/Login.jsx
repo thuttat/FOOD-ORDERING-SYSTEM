@@ -1,7 +1,7 @@
 import {Button} from "../../components/common/Button.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import axios from "axios";
+import api from "../../api/AxiosClient";
 
 export function Login() {
     const [formData, setFormData] = useState({
@@ -27,7 +27,7 @@ export function Login() {
             };
 
 
-            const response = await axios.post("http://localhost:8080/api/auth/login", payloadToSend);
+            const response = await api.post("/auth/login", payloadToSend);
 
             if (response.status === 200) {
                 localStorage.setItem("token", response.data.accessToken);
@@ -50,7 +50,7 @@ export function Login() {
                 }
             }
         } catch (error) {
-            console.error("Lỗi đăng nhập:", error);
+            console.error("Error:", error);
             alert("Login failed. Please check your credentials and try again.");
         }
     };

@@ -2,6 +2,7 @@ package duckie.example.backend.dto;
 
 import duckie.example.backend.entity.PaymentMethod;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 
 public record OrderRequest(
@@ -10,6 +11,6 @@ public record OrderRequest(
 
     String customerNote,
 
-    @NotBlank(message = "Phương thức thanh toán không được để trống")
+    @NotNull(message = "Phương thức thanh toán không được để trống")
     PaymentMethod paymentMethod 
 ) {}

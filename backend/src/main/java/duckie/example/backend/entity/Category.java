@@ -15,7 +15,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "categories", indexes = {
-    @Index(name = "idx_category_restaurant", columnList = "restaurant_id")
+    @Index(name = "idx_category_restaurant", columnList = "restaurant_id"),
+    @Index(name = "idx_category_name", columnList = "name")
 })
 public class Category extends BaseEntity {
 
@@ -27,7 +28,7 @@ public class Category extends BaseEntity {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String name;
 
     public Category() {}

@@ -1,6 +1,7 @@
 package duckie.example.backend.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +13,12 @@ import duckie.example.backend.entity.RestaurantStatus;
 
 @Repository
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
+    
+    List<Restaurant> findByStatus(RestaurantStatus status);
+    
+    Optional<Restaurant> findByOwnerId(Long ownerId); 
+    
     List<Restaurant> findByIsOpenTrueAndStatus(RestaurantStatus status);
-    List<Restaurant> findByOwnerId(Long ownerId); // Bổ sung cho chủ quán quản lý
+    
     Page<Restaurant> findByStatus(RestaurantStatus status, Pageable pageable);
 }
