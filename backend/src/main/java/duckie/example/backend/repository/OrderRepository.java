@@ -31,6 +31,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByRestaurantId(Long restaurantId);
 
+    @Query("SELECT SUM(o.totalAmount) FROM Order o " +
+           "WHERE o.status IN ('DELIVERED', 'COMPLETED') AND month(o.createdAt) = month(current_date)")
+    BigDecimal calculateRevenueThisMonth();
 
     @Query("SELECT new duckie.example.backend.dto.TopRestaurantResponse(" +
             "r.id, r.name, COUNT(DISTINCT o), SUM(o.totalAmount), CAST(COALESCE(AVG(rev.rating), 0.0) AS double)) " +
@@ -41,11 +44,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "GROUP BY r.id, r.name " +
             "ORDER BY COUNT(DISTINCT o) DESC, SUM(o.totalAmount) DESC")
     List<TopRestaurantResponse> findTop5Restaurants(Pageable pageable);
+    
     List<Order> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
 
     @Query("SELECT FUNCTION('MONTH', o.createdAt), SUM(o.totalAmount) " +
             "FROM Order o " +
-            "WHERE o.status = 'DELIVERED' AND FUNCTION('YEAR', o.createdAt) = FUNCTION('YEAR', CURRENT_DATE) " +
+            "WHERE o.status IN ('DELIVERED', 'COMPLETED') AND FUNCTION('YEAR', o.createdAt) = FUNCTION('YEAR', CURRENT_DATE) " +
             "GROUP BY FUNCTION('MONTH', o.createdAt) " +
             "ORDER BY FUNCTION('MONTH', o.createdAt) ASC")
     List<Object[]> getRawMonthlyRevenueData();
@@ -67,11 +71,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "WHERE created_at >= :startDate " +
             "GROUP BY CAST(created_at AS DATE) ORDER BY order_date ASC", nativeQuery = true)
     List<Object[]> getOrderStatsLast7Days(@Param("startDate") Instant startDate);
-
-
-    @Query("SELECT SUM(o.totalAmount) FROM Order o " +
-            "WHERE o.status = 'DELIVERED' AND month(o.createdAt) = month(current_date)")
-    BigDecimal calculateRevenueThisMonth();
 
     List<Order> findByRestaurantIdAndStatus(Long restaurantId, OrderStatus status);
 

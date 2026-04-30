@@ -55,9 +55,12 @@ export function AdminDashboard() {
 
     const statusColors = {
         "DELIVERED": "#10b981",
+        "COMPLETED": "#059669",
         "PENDING": "#f59e0b",
         "PREPARING": "#ff6b35",
-        "CANCELLED": "#ef4444"
+        "CANCELLED": "#ef4444",
+        "CONFIRMED": "#3b82f6",
+        "OUT_FOR_DELIVERY": "#6366f1"
     };
 
     const formattedRevenueData = stats.monthlyRevenueChart.map(item => ({
