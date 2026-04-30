@@ -23,7 +23,10 @@ const UserService = {
 
     updateRole: (id, role) => {
         return axiosClient.put(`users/admin/${id}/role?role=${role}`);
-    }
+    },
+    getUserProfile: (id) => axiosClient.get(`/users/${id}`),
+    
+    updateProfile: (id, data) => axiosClient.patch(`/users/${id}`, data)
 };
 
 export default UserService;

@@ -34,7 +34,7 @@ export function Header({
     const fetchNotifications = async () => {
         if (!user) return;
         try {
-            const res = await axiosClient.get('/notifications');
+            const res = await axiosClient.get('/notifications/me');
             setNotifications(res.data || []);
         } catch (error) {
             console.error("Error fetching notifications:", error);

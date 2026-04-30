@@ -1,12 +1,12 @@
-ALTER TABLE users ALTER COLUMN id RESTART WITH 10;
-ALTER TABLE restaurants ALTER COLUMN id RESTART WITH 10;
-ALTER TABLE categories ALTER COLUMN id RESTART WITH 10;
-ALTER TABLE menu_items ALTER COLUMN id RESTART WITH 20;
-ALTER TABLE carts ALTER COLUMN id RESTART WITH 10;
-ALTER TABLE cart_items ALTER COLUMN id RESTART WITH 10;
-ALTER TABLE notifications ALTER COLUMN id RESTART WITH 10;
-ALTER TABLE orders ALTER COLUMN id RESTART WITH 1;
-ALTER TABLE order_items ALTER COLUMN id RESTART WITH 1;
+ALTER TABLE users AUTO_INCREMENT = 10;
+ALTER TABLE restaurants AUTO_INCREMENT = 10;
+ALTER TABLE categories AUTO_INCREMENT = 10;
+ALTER TABLE menu_items AUTO_INCREMENT = 20;
+ALTER TABLE carts AUTO_INCREMENT = 10;
+ALTER TABLE cart_items AUTO_INCREMENT = 10;
+ALTER TABLE notifications AUTO_INCREMENT = 10;
+ALTER TABLE orders AUTO_INCREMENT = 1;
+ALTER TABLE order_items AUTO_INCREMENT = 1;
 
 INSERT INTO users (id, fullname, username, email, password, role, status, phone, created_at, updated_at) VALUES
                                                                                                              (1, 'Quản Trị Viên', 'admin', 'admin@food.com', '$2a$10$8WJmth6KBCIu3G9.3Zls7Osh06p7Vsh.A7mPrZ0S5H.K.fK6pI3Gu', 'ADMIN', 'ACTIVE', '0901234567', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
