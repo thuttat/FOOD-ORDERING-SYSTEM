@@ -19,3 +19,15 @@ app:
     cloud-name: your-cloud-name
     api-key: your-api-key
     api-secret: your-api-secret
+  spring:
+    mail:
+      host: smtp.gmail.com
+      port: 587
+      username: "your-gmail@gmail.com"
+      password: "your-app-password"
+      properties:
+        mail:
+          smtp:
+            auth: true
+            starttls:
+              enable: true

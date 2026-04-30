@@ -1,0 +1,1644 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /api/users/admin/{id}/status:
+    put:
+      tags:
+      - user-controller
+      operationId: updateUserStatus
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: status
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/users/admin/{id}/role:
+    put:
+      tags:
+      - user-controller
+      operationId: updateUserRole
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: role
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - USER
+          - ADMIN
+          - RESTAURANT
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/menu-items/{itemId}:
+    put:
+      tags:
+      - menu-controller
+      operationId: updateMenu
+      parameters:
+      - name: itemId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MenuItemRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MenuItemResponse"
+    delete:
+      tags:
+      - menu-controller
+      operationId: deleteMenu
+      parameters:
+      - name: itemId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+  /api/cart/items/{cartItemId}:
+    put:
+      tags:
+      - cart-controller
+      operationId: updateItemQuantity
+      parameters:
+      - name: cartItemId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: integer
+                format: int32
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+    delete:
+      tags:
+      - cart-controller
+      operationId: removeItem
+      parameters:
+      - name: cartItemId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+  /api/users/admin/create:
+    post:
+      tags:
+      - user-controller
+      operationId: createUserByAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/upload:
+    post:
+      tags:
+      - file-upload-controller
+      operationId: uploadFile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+    delete:
+      tags:
+      - file-upload-controller
+      operationId: deleteFile
+      parameters:
+      - name: imageUrl
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+  /api/reviews:
+    post:
+      tags:
+      - review-controller
+      operationId: createReview
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ReviewResponse"
+  /api/payments:
+    post:
+      tags:
+      - payment-controller
+      operationId: processPayment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentResponse"
+  /api/orders:
+    post:
+      tags:
+      - order-controller
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OrderResponse"
+  /api/menu-items:
+    post:
+      tags:
+      - menu-controller
+      operationId: createMenu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MenuItemRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MenuItemResponse"
+  /api/cart/items:
+    post:
+      tags:
+      - cart-controller
+      operationId: addItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartItemRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+  /api/auth/register:
+    post:
+      tags:
+      - auth-controller
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/auth/login:
+    post:
+      tags:
+      - auth-controller
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/admin/restaurants:
+    get:
+      tags:
+      - restaurant-controller
+      operationId: getAllRestaurants
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RestaurantResponse"
+    post:
+      tags:
+      - restaurant-controller
+      operationId: createRestaurantByAdmin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RestaurantRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestaurantResponse"
+  /api/users/{id}:
+    get:
+      tags:
+      - user-controller
+      operationId: findUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+    delete:
+      tags:
+      - user-controller
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+    patch:
+      tags:
+      - user-controller
+      operationId: patchUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserPatchRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/orders/{orderId}/status:
+    patch:
+      tags:
+      - order-controller
+      operationId: updateStatus
+      parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: status
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - CONFIRMED
+          - PREPARING
+          - OUT_FOR_DELIVERY
+          - DELIVERED
+          - CANCELLED
+          - COMPLETED
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OrderResponse"
+  /api/admin/restaurants/{id}/reinstate:
+    patch:
+      tags:
+      - restaurant-controller
+      operationId: reinstateRestaurant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestaurantResponse"
+  /api/admin/restaurants/{id}/lock:
+    patch:
+      tags:
+      - restaurant-controller
+      operationId: lockRestaurant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestaurantResponse"
+  /api/admin/restaurants/{id}/approve:
+    patch:
+      tags:
+      - restaurant-controller
+      operationId: approveRestaurant
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestaurantResponse"
+  /api/users:
+    get:
+      tags:
+      - user-controller
+      operationId: findAllUser
+      parameters:
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: role
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - USER
+          - ADMIN
+          - RESTAURANT
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageUserResponse"
+  /api/users/stats:
+    get:
+      tags:
+      - user-controller
+      operationId: getUserStats
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/restaurants:
+    get:
+      tags:
+      - restaurant-controller
+      operationId: findAllActiveRestaurants
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RestaurantResponse"
+  /api/restaurants/{restaurantId}/reviews:
+    get:
+      tags:
+      - review-controller
+      operationId: getRestaurantReviews
+      parameters:
+      - name: restaurantId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReviewResponse"
+  /api/restaurants/{restaurantId}/average-rating:
+    get:
+      tags:
+      - review-controller
+      operationId: getAverageRating
+      parameters:
+      - name: restaurantId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: number
+                format: double
+  /api/restaurants/{id}:
+    get:
+      tags:
+      - restaurant-controller
+      operationId: getRestaurantById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RestaurantResponse"
+  /api/payments/vnpay-callback:
+    get:
+      tags:
+      - payment-controller
+      operationId: vnpayCallback
+      parameters:
+      - name: vnp_TxnRef
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: vnp_ResponseCode
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/payments/momo-callback:
+    get:
+      tags:
+      - payment-controller
+      operationId: momoCallback
+      parameters:
+      - name: orderId
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: resultCode
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/orders/{orderId}:
+    get:
+      tags:
+      - order-controller
+      operationId: getOrderDetails
+      parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/OrderResponse"
+  /api/orders/me:
+    get:
+      tags:
+      - order-controller
+      operationId: getMyOrders
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderResponse"
+  /api/orders/admin:
+    get:
+      tags:
+      - order-controller
+      operationId: getAdminOrders
+      parameters:
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - CONFIRMED
+          - PREPARING
+          - OUT_FOR_DELIVERY
+          - DELIVERED
+          - CANCELLED
+          - COMPLETED
+      - name: restaurantName
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageOrderResponse"
+  /api/orders/admin/stats:
+    get:
+      tags:
+      - order-controller
+      operationId: getAdminOrderStats
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/notifications/me:
+    get:
+      tags:
+      - notification-controller
+      operationId: getMyNotifications
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotificationResponse"
+  /api/menu-items/category/{categoryId}:
+    get:
+      tags:
+      - menu-controller
+      operationId: getMenuItemsByCategory
+      parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MenuItemResponse"
+  /api/cart:
+    get:
+      tags:
+      - cart-controller
+      operationId: getCart
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CartResponse"
+    delete:
+      tags:
+      - cart-controller
+      operationId: clearCart
+      responses:
+        "200":
+          description: OK
+  /api/auth/me:
+    get:
+      tags:
+      - auth-controller
+      operationId: me
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/admin/reviews:
+    get:
+      tags:
+      - review-controller
+      operationId: getAllReviewsForAdmin
+      parameters:
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageReviewResponse"
+  /api/admin/reviews/stats:
+    get:
+      tags:
+      - review-controller
+      operationId: getReviewStats
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+  /api/admin/restaurants/pending:
+    get:
+      tags:
+      - restaurant-controller
+      operationId: getPendingRestaurants
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RestaurantResponse"
+  /api/admin/dashboard/stats:
+    get:
+      tags:
+      - admin-dashboard-controller
+      operationId: getStats
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DashboardStatsResponse"
+  /api/admin/reviews/{id}:
+    delete:
+      tags:
+      - review-controller
+      operationId: deleteReview
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        fullname:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+          enum:
+          - USER
+          - ADMIN
+          - RESTAURANT
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    MenuItemRequest:
+      required:
+      - categoryId
+      - name
+      - price
+      type: object
+      properties:
+        categoryId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        imageUrl:
+          type: string
+        isAvailable:
+          type: boolean
+    MenuItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        categoryId:
+          type: integer
+          format: int64
+        categoryName:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        imageUrl:
+          type: string
+        isAvailable:
+          type: boolean
+    CartItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        menuItemId:
+          type: integer
+          format: int64
+        itemName:
+          type: string
+        imageUrl:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+        unitPrice:
+          type: number
+        totalPrice:
+          type: number
+    CartResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItemResponse"
+        totalAmount:
+          type: number
+    UserRequest:
+      required:
+      - email
+      - fullname
+      - password
+      - phone
+      - username
+      type: object
+      properties:
+        fullname:
+          maxLength: 100
+          minLength: 3
+          type: string
+        username:
+          maxLength: 50
+          minLength: 3
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        password:
+          maxLength: 100
+          minLength: 6
+          type: string
+        role:
+          type: string
+          enum:
+          - USER
+          - ADMIN
+          - RESTAURANT
+    ReviewRequest:
+      required:
+      - orderId
+      type: object
+      properties:
+        orderId:
+          type: integer
+          format: int64
+        restaurantId:
+          type: integer
+          format: int64
+        menuItemId:
+          type: integer
+          format: int64
+        rating:
+          maximum: 5
+          minimum: 1
+          type: integer
+          format: int32
+        comment:
+          type: string
+    ReviewResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        restaurantId:
+          type: integer
+          format: int64
+        restaurantName:
+          type: string
+        customerId:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        rating:
+          type: integer
+          format: int32
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    PaymentRequest:
+      required:
+      - method
+      - orderId
+      type: object
+      properties:
+        orderId:
+          type: integer
+          format: int64
+        method:
+          type: string
+          enum:
+          - COD
+          - VNPAY
+          - MOMO
+    PaymentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        orderId:
+          type: integer
+          format: int64
+        transactionId:
+          type: string
+        method:
+          type: string
+        amount:
+          type: number
+        status:
+          type: string
+        paymentUrl:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    OrderRequest:
+      required:
+      - deliveryAddress
+      - restaurantId
+      type: object
+      properties:
+        restaurantId:
+          type: integer
+          format: int64
+        deliveryAddress:
+          type: string
+        customerNote:
+          type: string
+    OrderItemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        menuItemId:
+          type: integer
+          format: int64
+        itemName:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+        unitPrice:
+          type: number
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        customerName:
+          type: string
+        customerEmail:
+          type: string
+        restaurantId:
+          type: integer
+          format: int64
+        restaurantName:
+          type: string
+        totalAmount:
+          type: number
+        deliveryFee:
+          type: number
+        status:
+          type: string
+        deliveryAddress:
+          type: string
+        customerNote:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItemResponse"
+        createdAt:
+          type: string
+          format: date-time
+    CartItemRequest:
+      required:
+      - menuItemId
+      - quantity
+      type: object
+      properties:
+        menuItemId:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          format: int32
+    RegisterRequest:
+      required:
+      - email
+      - fullname
+      - password
+      - username
+      type: object
+      properties:
+        fullname:
+          maxLength: 50
+          minLength: 3
+          type: string
+        username:
+          maxLength: 50
+          minLength: 3
+          type: string
+        email:
+          type: string
+        password:
+          maxLength: 100
+          minLength: 6
+          type: string
+        role:
+          type: string
+          deprecated: true
+          enum:
+          - USER
+          - ADMIN
+          - RESTAURANT
+    LoginRequest:
+      required:
+      - password
+      - usernameOrEmail
+      type: object
+      properties:
+        usernameOrEmail:
+          type: string
+        password:
+          maxLength: 100
+          minLength: 6
+          type: string
+    AuthResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        tokenType:
+          type: string
+        expiresInSecond:
+          type: integer
+          format: int64
+        user:
+          $ref: "#/components/schemas/UserResponse"
+    RestaurantRequest:
+      required:
+      - address
+      - name
+      type: object
+      properties:
+        name:
+          maxLength: 200
+          minLength: 3
+          type: string
+        phoneNumber:
+          type: string
+        address:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        isOpen:
+          type: boolean
+        ownerId:
+          type: integer
+          format: int64
+    RestaurantResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        ownerId:
+          type: integer
+          format: int64
+        ownerName:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        address:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        isOpen:
+          type: boolean
+        status:
+          type: string
+          enum:
+          - PENDING
+          - ACTIVE
+          - LOCKED
+        rating:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        menuItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/MenuItemResponse"
+    UserPatchRequest:
+      type: object
+      properties:
+        fullname:
+          maxLength: 100
+          minLength: 3
+          type: string
+        phone:
+          type: string
+        username:
+          maxLength: 50
+          minLength: 3
+          type: string
+        email:
+          type: string
+        password:
+          maxLength: 100
+          minLength: 6
+          type: string
+        role:
+          type: string
+          deprecated: true
+          enum:
+          - USER
+          - ADMIN
+          - RESTAURANT
+        status:
+          type: string
+          deprecated: true
+          enum:
+          - ACTIVE
+          - INACTIVE
+    Pageable:
+      type: object
+      properties:
+        page:
+          minimum: 0
+          type: integer
+          format: int32
+        size:
+          minimum: 1
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            type: string
+    PageUserResponse:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResponse"
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortObject"
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        direction:
+          type: string
+        nullHandling:
+          type: string
+        ascending:
+          type: boolean
+        property:
+          type: string
+        ignoreCase:
+          type: boolean
+    PageOrderResponse:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderResponse"
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortObject"
+        empty:
+          type: boolean
+    NotificationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        message:
+          type: string
+        isRead:
+          type: boolean
+        type:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    PageReviewResponse:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReviewResponse"
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortObject"
+        empty:
+          type: boolean
+    ChartData:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: number
+    DashboardStatsResponse:
+      type: object
+      properties:
+        totalActiveUsers:
+          type: integer
+          format: int64
+        totalActiveRestaurants:
+          type: integer
+          format: int64
+        totalOrdersThisMonth:
+          type: integer
+          format: int64
+        revenueThisMonth:
+          type: number
+        monthlyRevenueChart:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChartData"
+        orderStatusChart:
+          type: array
+          items:
+            $ref: "#/components/schemas/StatusChartData"
+        topRestaurants:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopRestaurantResponse"
+    StatusChartData:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - PENDING
+          - CONFIRMED
+          - PREPARING
+          - OUT_FOR_DELIVERY
+          - DELIVERED
+          - CANCELLED
+          - COMPLETED
+        count:
+          type: integer
+          format: int64
+    TopRestaurantResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        orderCount:
+          type: integer
+          format: int64
+        revenue:
+          type: number
+        rating:
+          type: number
+          format: double

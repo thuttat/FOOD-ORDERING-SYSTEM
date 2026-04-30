@@ -1,6 +1,7 @@
-# Lựa chọn Mô hình Kiến trúc Client-Server kết hợp Layered Architecture
+# ADR-001: Lựa chọn Mô hình Kiến trúc Client-Server kết hợp Layered Architecture
 
-## Trạng thái: Đề xuất
+## Trạng thái:
+Accepted
 
 ## 1. Ngữ cảnh: 
 Hệ thống Food Ordering có 3 đối tượng người dùng chính (Khách hàng, Nhà hàng, Admin) thao tác trên các giao diện khác nhau nhưng cùng truy xuất và biến đổi một tập dữ liệu tập trung (thông tin đơn hàng, thực đơn, trạng thái thanh toán). Dự án có thời hạn triển khai trong 8 tuần. Chúng ta cần một kiến trúc hệ thống đảm bảo tính phân tách mối quan tâm, dễ dàng phân công công việc trong nhóm, và thuận tiện cho việc bảo trì, mở rộng sau này.
@@ -53,3 +54,6 @@ Hệ thống sẽ bắt đầu lộ trình chia tách thành Microservices khi g
 - Giai đoạn 2 - Chia tách cơ sở dữ liệu (Database Decomposition): Phá vỡ ranh giới Database Monolith. Chuyển từ việc các module JOIN trực tiếp các bảng của nhau sang việc mỗi module sở hữu một Database riêng biệt và giao tiếp qua API hoặc Event/Message Queue.
 
 - Giai đoạn 3 - Tách các dịch vụ cốt lõi (Core Domain Services): Tách tách biệt hoàn toàn Order Service, Payment Service, và User Service. Sử dụng hệ sinh thái Spring Cloud (như API Gateway, Eureka/Consul cho Service Discovery) để điều phối các microservices này.
+
+## Ngày quyết định
+2026-03-23

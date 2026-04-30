@@ -1,4 +1,4 @@
-package duckie.example.backend.service;
+package duckie.example.backend.security;
 
 import duckie.example.backend.entity.User;
 import duckie.example.backend.repository.UserRepository;
