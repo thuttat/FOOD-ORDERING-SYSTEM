@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-import duckie.example.backend.dto.ChartData;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,7 +25,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<StatusChartData> countOrderByStatusThisMonth();
 
     @Query("SELECT SUM(o.totalAmount) FROM Order o " +
-           "WHERE o.status = 'DELIVERED' AND month(o.createdAt) = month(current_date)")
+           "WHERE o.status IN ('DELIVERED', 'COMPLETED') AND month(o.createdAt) = month(current_date)")
     BigDecimal calculateRevenueThisMonth();
 
     @Query("SELECT new duckie.example.backend.dto.TopRestaurantResponse(" +
@@ -42,7 +41,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT FUNCTION('MONTH', o.createdAt), SUM(o.totalAmount) " +
             "FROM Order o " +
-            "WHERE o.status = 'DELIVERED' AND FUNCTION('YEAR', o.createdAt) = FUNCTION('YEAR', CURRENT_DATE) " +
+            "WHERE o.status IN ('DELIVERED', 'COMPLETED') AND FUNCTION('YEAR', o.createdAt) = FUNCTION('YEAR', CURRENT_DATE) " +
             "GROUP BY FUNCTION('MONTH', o.createdAt) " +
             "ORDER BY FUNCTION('MONTH', o.createdAt) ASC")
     List<Object[]> getRawMonthlyRevenueData();
