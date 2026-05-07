@@ -12,14 +12,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
+        // Bất kỳ tin nhắn nào phát ra từ backend có tiền tố "/topic" sẽ được đẩy thẳng tới Frontend
         config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Mở cổng "/ws" cho Frontend ReactJS kết nối vào
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("http://localhost:5173")
+                .setAllowedOriginPatterns("http://localhost:3000")
                 .withSockJS(); 
     }
 

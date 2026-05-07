@@ -67,9 +67,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/menu/**").hasAnyRole("RESTAURANT")
                         .requestMatchers(HttpMethod.PUT, "/api/menu/**").hasAnyRole("RESTAURANT")
                         .requestMatchers(HttpMethod.DELETE, "/api/menu/**").hasAnyRole("RESTAURANT")
-                        .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasAnyRole("RESTAURANT")
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasAnyRole("RESTAURANT","USER")
                         .requestMatchers(HttpMethod.GET, "/api/restaurants/analytics").hasAnyRole("RESTAURANT")
-                        .requestMatchers("/ws/**").permitAll() // Mở cổng cho WebSockets (RabbitMQ)
+                        .requestMatchers("/ws/**").permitAll() 
 
                         .requestMatchers("/api/payments/vnpay-callback", "/api/payments/momo-callback").permitAll()
                         .anyRequest().authenticated()
@@ -79,7 +79,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(customAccessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
     }

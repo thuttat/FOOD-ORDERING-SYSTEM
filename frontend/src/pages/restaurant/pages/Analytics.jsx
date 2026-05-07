@@ -19,6 +19,7 @@ export default function AdvancedRestaurantAnalytics() {
         const fetchAnalytics = async () => {
             try {
                 const res = await axiosClient.get('/restaurants/analytics');
+                console.log("DỮ LIỆU BACKEND TRẢ VỀ:", res.data);
                 setAnalyticsData(res.data || res);
             } catch (error) {
                 console.error("Error loading analytics data:", error);

@@ -22,14 +22,25 @@ export function OrderSummary({ total = 0, cartData }) {
             setLoading(true);
             const resId = cartData.restaurantId || cartData.items?.[0]?.menuItem?.restaurantId || 1;
 
-            const orderRes = await OrderService.placeOrder({ restaurantId: resId, deliveryAddress: address });
+            const orderRes = await OrderService.placeOrder({ 
+                restaurantId: resId, 
+                deliveryAddress: address,
+                paymentMethod: method 
+            });
 
-            const payRes = await PaymentService.createPayment({ orderId: orderRes.data.id, method: method });
+            const payRes = await PaymentService.createPayment({ 
+                orderId: orderRes.data.id, 
+                method: method,
+                amount: grandTotal 
+            });
 
             if (method === 'COD') {
                 window.location.href = "/orders";
-            } else if (payRes.data?.paymentUrl) {
-                window.location.href = payRes.data.paymentUrl;
+            } else  {
+               const redirectUrl = payRes.data?.url || payRes.data?.paymentUrl;
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
             }
         } catch (error) {
             console.error("Payment error:", error);

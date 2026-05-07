@@ -5,16 +5,16 @@ app:
     refresh-token-expires-ms: 604800000
   payment:
     vnpay:
-      tmn-code: 2QX7C5XJ
-      hash-secret: NCFNSVUECHNPBHSGZETMTIBBJSKOTUQX
+      tmn-code: IVN0ZMWM
+      hash-secret: DWNZDYT99VTGXXDDMD59VNBGR6ROY5HP
       url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-      return-url: http://localhost:5173/payment-result
+      return-url: http://localhost:8081/api/payments/vnpay-callback
     momo:
       partner-code: MOMOBKUN20180529
       access-key: klm05nu13s1puph7
       secret-key: atQs0nSXYs9iw9Z8792mUn7VS7yVmiF4
       endpoint: https://test-payment.momo.vn/v2/gateway/api/create
-      return-url: http://localhost:5173/payment-result
+      return-url: http://localhost:8081/api/payments/momo-callback
   cloudinary:
     cloud-name: dt3btnnxy
     api-key: 463966291979622

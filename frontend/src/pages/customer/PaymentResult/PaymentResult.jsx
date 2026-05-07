@@ -9,8 +9,8 @@ export function PaymentResult() {
 
     useEffect(() => {
         const verify = async () => {
-            const vnpCode = searchParams.get("vnp_ResponseCode");
-            const momoCode = searchParams.get("resultCode");
+            const vnpCode = searchParams.get("status");
+            const momoCode = searchParams.get("status");
 
             if (vnpCode === "00" || momoCode === "0") {
                 setStatus("success");

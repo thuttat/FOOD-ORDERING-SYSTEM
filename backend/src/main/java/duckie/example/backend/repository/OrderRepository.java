@@ -15,6 +15,7 @@ import duckie.example.backend.dto.StatusChartData;
 import duckie.example.backend.dto.TopRestaurantResponse;
 import duckie.example.backend.entity.Order;
 import duckie.example.backend.entity.OrderStatus;
+import jakarta.persistence.Tuple;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -72,7 +73,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "GROUP BY CAST(created_at AS DATE) ORDER BY order_date ASC", nativeQuery = true)
     List<Object[]> getOrderStatsLast7Days(@Param("startDate") Instant startDate);
 
-    List<Order> findByRestaurantIdAndStatus(Long restaurantId, OrderStatus status);
+    List<Order> findByRestaurantIdAndStatus(Long resId, OrderStatus statuses);
+
+    List<Order> findByRestaurantIdAndStatusIn(Long resId, List<OrderStatus> statuses);
 
     @Query("SELECT SUM(o.totalAmount) FROM Order o WHERE o.restaurant.id = :resId AND o.status = 'DELIVERED'")
     BigDecimal calculateTotalRevenue(@Param("resId") Long resId);
@@ -85,21 +88,21 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT function('DATE_FORMAT', o.createdAt, '%H:00'), COUNT(o) " +
             "FROM Order o WHERE o.restaurant.id = :resId GROUP BY function('DATE_FORMAT', o.createdAt, '%H:00')")
-    List<Object[]> findPeakHourStats(@Param("resId") Long resId);
+    List<Tuple> findPeakHourStats(@Param("resId") Long resId);
 
     @Query("SELECT c.name, COUNT(o), SUM(oi.unitPrice * oi.quantity) " +
             "FROM Order o JOIN o.items oi JOIN oi.menuItem mi JOIN mi.category c " +
             "WHERE o.restaurant.id = :resId AND o.status = 'DELIVERED' " +
             "GROUP BY c.name")
-    List<Object[]> findSalesByCategory(@Param("resId") Long resId);
+    List<Tuple> findSalesByCategory(@Param("resId") Long resId);
 
     @Query("SELECT mi.name, CAST(COUNT(oi) AS int), SUM(oi.unitPrice * oi.quantity), mi.imageUrl, mi.id, mi.price " +
-            "FROM Order o JOIN o.items oi JOIN oi.menuItem mi " +
-            "WHERE o.restaurant.id = :resId AND o.status = duckie.example.backend.entity.OrderStatus.DELIVERED " +
-            "GROUP BY mi.name, mi.imageUrl, mi.id, mi.price " +
-            "ORDER BY SUM(oi.unitPrice * oi.quantity) DESC")
+        "FROM Order o JOIN o.items oi JOIN oi.menuItem mi " +
+        "WHERE o.restaurant.id = :resId AND o.status = duckie.example.backend.entity.OrderStatus.DELIVERED " +
+        "GROUP BY mi.name, mi.imageUrl, mi.id, mi.price " +
+        "ORDER BY SUM(oi.unitPrice * oi.quantity) DESC")
     List<Object[]> findTopSellingItems(@Param("resId") Long resId);
-
+    
     @Query("SELECT COALESCE(SUM(oi.unitPrice * oi.quantity), 0) " +
             "FROM Order o JOIN o.items oi " +
             "WHERE oi.menuItem.id = :itemId " +
@@ -142,4 +145,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "AND FUNCTION('YEAR', o.createdAt) = FUNCTION('YEAR', CURRENT_DATE) " +
             "GROUP BY o.status")
     List<StatusChartData> countOrderByStatusThisMonth();
+    List<Order> findByRestaurantOwnerIdOrderByCreatedAtDesc(Long ownerId);
 }

@@ -1,7 +1,6 @@
 package duckie.example.backend.service;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -27,16 +26,19 @@ import org.springframework.transaction.annotation.Transactional;
 import duckie.example.backend.config.RabbitMQConfig;
 import duckie.example.backend.dto.OrderRequest;
 import duckie.example.backend.dto.OrderResponse;
-import duckie.example.backend.dto.PaymentRequest;
 import duckie.example.backend.dto.StatusChartData;
-import duckie.example.backend.entity.*;
+import duckie.example.backend.entity.Cart;
+import duckie.example.backend.entity.CartItem;
+import duckie.example.backend.entity.Order;
+import duckie.example.backend.entity.OrderItem;
+import duckie.example.backend.entity.OrderStatus;
+import duckie.example.backend.entity.Restaurant;
+import duckie.example.backend.entity.User;
 import duckie.example.backend.mapper.OrderItemMapper;
 import duckie.example.backend.mapper.OrderMapper;
-import duckie.example.backend.mapper.PaymentMapper;
 import duckie.example.backend.repository.CartItemRepository;
 import duckie.example.backend.repository.CartRepository;
 import duckie.example.backend.repository.OrderRepository;
-import duckie.example.backend.repository.PaymentRepository;
 import duckie.example.backend.repository.RestaurantRepository;
 import duckie.example.backend.repository.UserRepository;
 
@@ -51,14 +53,11 @@ public class OrderService {
     private final OrderItemMapper orderItemMapper;
     private final RabbitTemplate rabbitTemplate;
     private final RestaurantRepository restaurantRepository;
-    private final PaymentMapper paymentMapper;
 
-    private final PaymentRepository paymentRepository;
 
     public OrderService(UserRepository userRepository, OrderRepository orderRepository, CartRepository cartRepository,
                         CartItemRepository cartItemRepository, OrderMapper orderMapper, OrderItemMapper orderItemMapper,
-                        RabbitTemplate rabbitTemplate, RestaurantRepository restaurantRepository,
-                        PaymentMapper paymentMapper, PaymentRepository paymentRepository) {
+                        RabbitTemplate rabbitTemplate, RestaurantRepository restaurantRepository) {
         this.userRepository = userRepository;
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
@@ -67,8 +66,7 @@ public class OrderService {
         this.orderItemMapper = orderItemMapper;
         this.rabbitTemplate = rabbitTemplate;
         this.restaurantRepository = restaurantRepository;
-        this.paymentMapper = paymentMapper;
-        this.paymentRepository = paymentRepository;
+        
     }
 
     @Transactional(readOnly = true)
@@ -103,19 +101,10 @@ public class OrderService {
                 .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .add(order.getDeliveryFee());
+                // .add(order.getDeliveryFee() != null ? order.getDeliveryFee() : BigDecimal.valueOf(15000));
         order.setTotalAmount(total);
 
         Order savedOrder = orderRepository.save(order);
-
-        PaymentMethod method = request.paymentMethod();
-        Payment payment = paymentMapper.toEntity(
-                new PaymentRequest(savedOrder.getId(), method, savedOrder.getTotalAmount()),
-                savedOrder,
-                "TXN_" + System.currentTimeMillis()
-        );
-        paymentRepository.save(payment);
-
-        cartItemRepository.deleteByCartId(cart.getId());
 
         OrderResponse response = orderMapper.toResponse(savedOrder);
 
@@ -186,7 +175,7 @@ public class OrderService {
             if (row[0] instanceof LocalDate) {
                 localDate = (LocalDate) row[0];
             } else if (row[0] instanceof java.sql.Date) {
-                localDate = ((Date) row[0]).toLocalDate();
+                localDate = ((java.sql.Date) row[0]).toLocalDate();
             } else if (row[0] instanceof String) {
                 localDate = LocalDate.parse((String) row[0]);
             }
@@ -213,8 +202,18 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public List<OrderResponse> getMyOrderHistory(String username) {
-        User customerUser = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(customerUser.getId()).stream().map(orderMapper::toResponse).collect(Collectors.toList());
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getRole().name().equals("RESTAURANT")) {
+            return orderRepository.findByRestaurantOwnerIdOrderByCreatedAtDesc(user.getId())
+                    .stream()
+                    .map(orderMapper::toResponse)
+                    .collect(Collectors.toList());
+        }
+        return orderRepository.findByCustomerIdOrderByCreatedAtDesc(user.getId())
+                .stream()
+                .map(orderMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)

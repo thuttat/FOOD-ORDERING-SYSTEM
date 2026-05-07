@@ -25,7 +25,7 @@ public record RestaurantAnalyticsResponse(
     public record PeakHourData(String hour, Long orders) {}
     
     
-    public record CategorySalesData(String name, int value, BigDecimal amount, String color) {}
+    public record CategorySalesData(String name, Long value, BigDecimal amount, String color) {}
     public record TopMenuItemData(
         int rank, 
         String name, 

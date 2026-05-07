@@ -1,6 +1,7 @@
 package duckie.example.backend.service;
 
 import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class CartService {
         this.cartMapper = cartMapper;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CartResponse getCart(String username) {
         User customer = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", username));

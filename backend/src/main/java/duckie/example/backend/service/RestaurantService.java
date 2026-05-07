@@ -1,15 +1,16 @@
 package duckie.example.backend.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException; // Chỉ dùng IOException chuẩn của Java
+import java.io.IOException; 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -43,6 +44,7 @@ import duckie.example.backend.mapper.RestaurantMapper;
 import duckie.example.backend.repository.OrderRepository;
 import duckie.example.backend.repository.RestaurantRepository;
 import duckie.example.backend.repository.UserRepository;
+import jakarta.persistence.Tuple;
 
 @Service
 public class RestaurantService {
@@ -198,23 +200,35 @@ public class RestaurantService {
 
     @Transactional(readOnly = true)
     public RestaurantAnalyticsResponse getAnalytics(String username, String timeFilter) {
+        // Tìm user đang đăng nhập dựa vào username
         User user = userRepository.findByUsername(username).orElseThrow();
+        // Tìm nhà hàng mà user này đang làm chủ
         Restaurant restaurant = restaurantRepository.findByOwnerId(user.getId()).orElseThrow();
         Long resId = restaurant.getId();
 
         LocalDateTime now = LocalDateTime.now();
+        // Nếu user chọn "Last 30 Days" thì mốc bắt đầu trừ đi 30 ngày, mặc định thì trừ 7 ngày
         LocalDateTime currentStart = "Last 30 Days".equals(timeFilter) ? now.minusDays(30) : now.minusDays(7);
 
-        java.time.Instant nowInst = now.atZone(ZoneId.systemDefault()).toInstant();
-        java.time.Instant startInst = currentStart.atZone(ZoneId.systemDefault()).toInstant();
+        // Chuyển đổi sang kiểu Instant để tương thích với các câu truy vấn chuẩn của JPA/Hibernate
+        Instant nowInst = now.atZone(ZoneId.systemDefault()).toInstant();
+        Instant startInst = currentStart.atZone(ZoneId.systemDefault()).toInstant();
 
+        // Đếm tổng số lượng đơn hàng trong khoảng thời gian đã chọn
         long totalOrders = orderRepository.countOrdersInPeriod(resId, startInst, nowInst);
+        // Tính tổng doanh thu (cộng dồn Total Amount)
         BigDecimal totalRevenue = orderRepository.calculateRevenueInPeriod(resId, startInst, nowInst);
+        // Nếu không có đơn nào (kết quả truy vấn là null) thì gán bằng 0 để tránh lỗi NullPointerException
+        if (totalRevenue == null) totalRevenue = BigDecimal.ZERO; 
+        // Tính giá trị trung bình mỗi đơn (AOV) = Tổng doanh thu / Tổng số đơn
+        // Kiểm tra totalOrders > 0 để tránh lỗi chia cho 0 (Divide by zero) nếu nhà hàng chưa bán được gì
         BigDecimal avgOrderValue = totalOrders > 0 ? totalRevenue.divide(BigDecimal.valueOf(totalOrders), 0, RoundingMode.HALF_UP) : BigDecimal.ZERO;
 
-        List<Order> completedOrders = orderRepository.findByRestaurantIdAndStatus(resId, OrderStatus.DELIVERED);
+        // Chỉ lấy các đơn hàng có trạng thái Đã Hoàn Thành (COMPLETED)
+        List<Order> completedOrders = orderRepository.findByRestaurantIdAndStatus(resId, OrderStatus.COMPLETED);
         DateTimeFormatter df = DateTimeFormatter.ofPattern("MMM dd").withZone(ZoneId.systemDefault());
 
+        // Nhóm các đơn hàng theo từng ngày
         List<DailyRevenueData> revenueOrderData = completedOrders.stream()
                 .collect(Collectors.groupingBy(o -> df.format(o.getCreatedAt())))
                 .entrySet().stream()
@@ -223,8 +237,53 @@ public class RestaurantService {
                         (long) e.getValue().size()))
                 .collect(Collectors.toList());
 
-        return new RestaurantAnalyticsResponse(totalRevenue, 0.0, totalOrders, 0.0, avgOrderValue, 0.0, 0.0, 0.0, revenueOrderData, new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+       
+        List<Tuple> rawPeakHours = orderRepository.findPeakHourStats(resId);
+        List<RestaurantAnalyticsResponse.PeakHourData> peakHoursData = rawPeakHours.stream()
+                .map(tuple -> new RestaurantAnalyticsResponse.PeakHourData(
+                        tuple.get(0, String.class),                
+                        ((Number) tuple.get(1)).longValue()         
+                ))
+                .collect(Collectors.toList());
+
+        
+        List<Tuple> rawCategorySales = orderRepository.findSalesByCategory(resId);
+        List<RestaurantAnalyticsResponse.CategorySalesData> salesByCategory = rawCategorySales.stream()
+                .map(tuple -> new RestaurantAnalyticsResponse.CategorySalesData(
+                        tuple.get(0, String.class),               
+                        ((Number) tuple.get(1)).longValue(),        
+                        tuple.get(2) != null ? new BigDecimal(tuple.get(2).toString()) : BigDecimal.ZERO, 
+                        "#3b82f6"
+                ))
+                .collect(Collectors.toList());
+
+
+        AtomicInteger rankCounter = new AtomicInteger(1);
+        List<Object[]> rawTopItems = orderRepository.findTopSellingItems(resId);
+        List<RestaurantAnalyticsResponse.TopMenuItemData> topMenuItems = rawTopItems.stream()
+        .map(row -> new RestaurantAnalyticsResponse.TopMenuItemData(
+                rankCounter.getAndIncrement(),               
+                (String) row[0],                               
+                "N/A",                                        
+                row[3] != null ? (String) row[3] : "N/A",      
+                row[5] != null ? String.valueOf(row[5]) : "0", 
+                ((Number) row[1]).intValue(),                  
+                row[2] != null ? String.valueOf(row[2]) : "0", 
+                "0%",                                        
+                "vs last week",                              
+                new java.util.ArrayList<>()                    
+        ))
+        .collect(Collectors.toList());
+      
+        return new RestaurantAnalyticsResponse(
+                totalRevenue, 0.0, totalOrders, 0.0, avgOrderValue, 0.0, 0.0, 0.0, 
+                revenueOrderData, 
+                peakHoursData,  
+                salesByCategory, 
+                topMenuItems     
+        );
     }
+
 
     private double calculatePercentageChange(BigDecimal previous, BigDecimal current) {
         if (previous == null || previous.compareTo(BigDecimal.ZERO) == 0) return 0.0;
@@ -236,12 +295,28 @@ public class RestaurantService {
         User user = userRepository.findByUsername(username).orElseThrow();
         Restaurant restaurant = restaurantRepository.findByOwnerId(user.getId()).orElseThrow();
 
+        List<OrderStatus> reportStatuses = List.of(OrderStatus.DELIVERED, OrderStatus.COMPLETED);
+        List<Order> orders = orderRepository.findByRestaurantIdAndStatusIn(restaurant.getId(), reportStatuses);
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Analytics Report");
+            
             Row header = sheet.createRow(0);
             header.createCell(0).setCellValue("Order ID");
             header.createCell(1).setCellValue("Customer");
             header.createCell(2).setCellValue("Amount");
+            header.createCell(3).setCellValue("Status");
+
+            int rowIdx = 1;
+            for (Order order : orders) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(order.getId());
+                row.createCell(1).setCellValue(order.getCustomer().getFullname()); 
+                row.createCell(2).setCellValue(order.getTotalAmount().doubleValue());
+                row.createCell(3).setCellValue(order.getStatus().toString());
+            }
+
+            sheet.autoSizeColumn(0);
+            sheet.autoSizeColumn(1);
 
             workbook.write(out);
             return out.toByteArray();

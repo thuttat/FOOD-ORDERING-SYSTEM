@@ -6,12 +6,17 @@ import axiosClient from '../../../apis/AxiosClient';
 import ConnectionStatus from '../components/shared/ConnectionStatus';
 import OrderCard from '../components/orders/OrderCard';
 
+import { useAuth } from '../../../services/AuthContext';
+
+
 export default function RealtimeOrders() {
   // const [soundEnabled, setSoundEnabled] = useState(true);
   const [connected, setConnected] = useState(false);
   const [orders, setOrders] = useState([]);
   // const soundRef = useRef(soundEnabled);
   // useEffect(() => { soundRef.current = soundEnabled; }, [soundEnabled]);
+
+  const { user } = useAuth();
 
   const fetchOrders = async () => {
     try {
@@ -34,15 +39,19 @@ export default function RealtimeOrders() {
         setConnected(true);
         stompClient.subscribe('/topic/orders', (message) => {
           const newOrder = JSON.parse(message.body);
-          setOrders(prev => {
-            if (prev.find(o => o.id === newOrder.id)) return prev;
-            return [newOrder, ...prev];
-          });
+          if (newOrder.restaurantId === user?.restaurantId) {
+            setOrders(prev => {
+              if (prev.find(o => o.id === newOrder.id)) return prev;
+              return [newOrder, ...prev];
+            });
           
           // if (soundRef.current) {
           //   const audio = new Audio('/assets/notification.mp3');
           //   audio.play().catch(() => console.log("Audio blocked"));
           // }
+        } else {
+             console.log("Orders from other restaurants have been ignored.:", newOrder.id);
+          }
         });
       },
       onDisconnect: () => setConnected(false),
@@ -52,7 +61,7 @@ export default function RealtimeOrders() {
     stompClient.activate();
 
     return () => stompClient.deactivate();
-  }, []);
+  }, [user]);
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     if (['DELIVERED', 'CANCELLED'].includes(newStatus)) {
