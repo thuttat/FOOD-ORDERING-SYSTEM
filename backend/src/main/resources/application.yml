@@ -5,26 +5,26 @@ app:
     refresh-token-expires-ms: 604800000
   payment:
     vnpay:
-      tmn-code: IVN0ZMWM
-      hash-secret: DWNZDYT99VTGXXDDMD59VNBGR6ROY5HP
+      tmn-code: yours
+      hash-secret: yours
       url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
       return-url: http://localhost:8081/api/payments/vnpay-callback
     momo:
-      partner-code: MOMOBKUN20180529
-      access-key: klm05nu13s1puph7
+      partner-code: yours
+      access-key: yours
       secret-key: atQs0nSXYs9iw9Z8792mUn7VS7yVmiF4
       endpoint: https://test-payment.momo.vn/v2/gateway/api/create
       return-url: http://localhost:8081/api/payments/momo-callback
   cloudinary:
-    cloud-name: dt3btnnxy
-    api-key: 463966291979622
-    api-secret: qh9cOXw9UUo-BKRyFl6OTY-FYis
+    cloud-name: yours
+    api-key: yours
+    api-secret: yours
   spring:
     mail:
       host: smtp.gmail.com
       port: 587
-      username: "thutrinh2442@gmail.com"
-      password: "gtjmgvanxmjsrxdb"
+      username: "yours"
+      password: "yours"
       properties:
         mail:
           smtp:
